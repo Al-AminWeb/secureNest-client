@@ -1,0 +1,9 @@
+@import 'tailwindcss';
+@plugin "flowbite/plugin";
+@source "../node_modules/flowbite";
+
+@theme {
+    --color-primary: #2C3E50;
+    --color-accent:#1ABC9C;
+    --color-background:#FAF9F6;
+}
