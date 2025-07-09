@@ -1,62 +1,165 @@
-import { use } from 'react'
-import { AuthContext } from '../../contexts/AuthContext.jsx'
-import Swal from 'sweetalert2'
-import { useLocation, useNavigate } from 'react-router'
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { NavLink } from 'react-router';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { FcGoogle } from 'react-icons/fc';
+import Swal from "sweetalert2";
+import useAuth from "../../hooks/useAuth.js";
 
 const SignIn = () => {
-  const { signIn } = use(AuthContext)
-  const location = useLocation()
-  const navigate = useNavigate()
-  const handleSignIn = e => {
-    e.preventDefault()
-    const form = e.target
-    const email = form.email.value
-    const password = form.password.value
+  const [showPassword, setShowPassword] = useState(false);
+  const { signIn,signInWithGoogle } = useAuth();
+  const handleGoogleSignIn = ()=>{
+    signInWithGoogle()
+        .then((result)=>{
+          console.log(result);
+        })
+    .catch((error)=>{
+      console.log(error);
+    })
+  }
 
-    // firebase sign in send
-    signIn(email, password)
-      .then(result => {
-        console.log(result.user)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm();
+
+  const onSubmit = async (data) => {
+    try {
+      const result = await signIn(data.email, data.password);
+
+      if (result.user) {
         Swal.fire({
           icon: 'success',
           title: 'Login Successful!',
-          showConfirmButton: false,
+          text: `Welcome back, ${result.user.displayName || 'User'}!`,
           timer: 1500,
-        })
-        navigate(`${location.state ? location.state : '/'}`)
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  }
+          showConfirmButton: false,
+        });
 
+        // setTimeout(() => {
+        //   navigate(from, { replace: true });
+        // }, 1600);
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: error.message,
+      });
+    }
+  };
   return (
-    <div className='card bg-base-100 max-w-sm mx-auto shrink-0 shadow-2xl my-12'>
-      <div className='card-body'>
-        <h1 className='text-5xl font-bold'>Sign In now!</h1>
-        <form onSubmit={handleSignIn} className='fieldset'>
-          <label className='label'>Email</label>
-          <input
-            type='email'
-            name='email'
-            className='input'
-            placeholder='Email'
-          />
-          <label className='label'>Password</label>
-          <input
-            type='password'
-            name='password'
-            className='input'
-            placeholder='Password'
-          />
-          <div>
-            <a className='link link-hover'>Forgot password?</a>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#2C3E50] to-[#1ABC9C] p-6">
+        <div className="max-w-6xl w-full flex flex-col md:flex-row items-center justify-between">
+          {/* Left Section */}
+          <div className="text-white md:w-1/2 mb-10 md:mb-0 md:pr-10">
+            <h2 className="text-xl md:text-2xl font-semibold mb-2">New Online Platform</h2>
+            <h1 className="text-4xl md:text-5xl font-bold text-lime-300 mb-6">SecureNest</h1>
+            <ul className="space-y-3 text-sm md:text-base">
+              <li>Anywhere, Anytime; Enjoy New Services -</li>
+              <li>🔐 Easy Log In Experience</li>
+              <li>📋 Multiple Policy Information at Once</li>
+              <li>📄 All Certificates and Payment History in One Place</li>
+            </ul>
           </div>
-          <button className='btn btn-neutral mt-4'>Sign in</button>
-        </form>
-      </div>
-    </div>
-  )
-}
 
-export default SignIn
+          {/* Right Section - Login Card */}
+          <div className="bg-white rounded-xl shadow-lg p-8 w-full md:w-1/2">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Hello there!</h2>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {/* Email */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Username (Email)
+                </label>
+                <input
+                    type="email"
+                    id="email"
+                    {...register('email', {
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^\S+@\S+$/i,
+                        message: 'Invalid email address'
+                      }
+                    })}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-accent focus:border-accent"
+                />
+                {errors.email && (
+                    <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>
+                )}
+              </div>
+
+              {/* Password */}
+              <div className="relative">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    {...register('password', {
+                      required: 'Password is required',
+                      minLength: {
+                        value: 6,
+                        message: 'Password must be at least 6 characters'
+                      }
+                    })}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-accent focus:border-accent"
+                />
+                <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-9 text-gray-600 hover:text-accent"
+                >
+                  {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
+                </button>
+                {errors.password && (
+                    <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
+                )}
+              </div>
+
+              {/* Forgot Password */}
+              <div className="flex justify-end text-sm">
+                <NavLink to="/forgot-password" className="text-accent hover:underline">
+                  Forgot Password?
+                </NavLink>
+              </div>
+
+              {/* Submit */}
+              <button
+                  type="submit"
+                  className="w-full bg-accent text-white py-2 px-4 rounded-md hover:bg-teal-600 transition"
+              >
+                Log In
+              </button>
+
+              <p className="text-xl text-primary text-center">Or</p>
+
+              {/* Google Sign-in */}
+              <div>
+                <button onClick={handleGoogleSignIn}
+                    type="button"
+                    className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-md py-2 px-4 text-sm font-medium text-gray-700 hover:bg-gray-100 transition"
+                >
+                  <FcGoogle className="w-5 h-5" />
+                  Sign in with Google
+                </button>
+              </div>
+
+              {/* Link to Register */}
+              <p className="text-center text-sm text-gray-600">
+                New to SecureNest?{' '}
+                <NavLink to="/signup" className="text-accent hover:underline">
+                  Register
+                </NavLink>
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+  );
+};
+
+export default SignIn;

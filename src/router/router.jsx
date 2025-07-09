@@ -1,0 +1,49 @@
+import {
+    createBrowserRouter,
+} from "react-router";
+import MainLayout from "../layouts/MainLayout.jsx";
+import Home from "../pages/Home/Home.jsx";
+import SignIn from "../pages/signIn/SignIn.jsx";
+import SignUp from "../pages/signUp/SignUp.jsx";
+import AuthLayout from "../layouts/AuthLayouts.jsx";
+import DashboardLayout from "../layouts/DashboardLayout.jsx";
+import ManagePolicies from "../pages/DashBoard/ManagePolicies/ManagePolicies.jsx";
+
+export const router = createBrowserRouter([
+    {
+        path: '/',
+        Component: MainLayout,
+        children: [
+            {
+                index: true,
+                Component: Home,
+            },
+        ],
+    },
+    {
+        path: '/',
+        Component: AuthLayout,
+        children: [
+            {
+                path: 'signin',
+                Component: SignIn,
+            },
+            {
+                path: 'signup',
+                Component: SignUp,
+            },
+        ]
+    },
+    {
+        path:'/dashboard',
+        Component: DashboardLayout,
+        children:
+        [
+            {
+                path:'manage-policies',
+                Component:ManagePolicies,
+            }
+
+        ]
+    }
+])
