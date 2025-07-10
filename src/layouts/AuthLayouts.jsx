@@ -1,6 +1,6 @@
 import React from 'react';
 import {Outlet} from 'react-router';
-import Header from "../components/Navbar/Header.jsx";
+import Header from "../pages/shared/Navbar/Header.jsx";
 
 const AuthLayout = () => {
     return (

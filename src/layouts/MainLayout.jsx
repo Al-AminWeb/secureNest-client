@@ -1,5 +1,5 @@
 import {Outlet} from 'react-router'
-import Navbar from '../components/Navbar/Header.jsx'
+import Navbar from '../pages/shared/Navbar/Header.jsx'
 
 const MainLayout = () => {
     return (

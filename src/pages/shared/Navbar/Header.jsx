@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import { NavLink } from 'react-router';
-import { AuthContext } from '../../contexts/AuthContext';
-import logo from '../../assets/logo (3).png';
+import { AuthContext } from '../../../contexts/AuthContext.jsx';
+import logo from '../../../assets/logo (3).png';
 
 const Header = () => {
     const { user, logOut } = useContext(AuthContext);
