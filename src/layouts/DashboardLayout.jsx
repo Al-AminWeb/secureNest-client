@@ -1,47 +1,83 @@
 import { NavLink, Outlet } from 'react-router';
-import { HiDocumentText, HiUserGroup, HiClipboardCheck, HiCurrencyDollar, HiUserCircle } from 'react-icons/hi';
+import {
+    HiDocumentText,
+    HiUserGroup,
+    HiClipboardCheck,
+    HiCurrencyDollar,
+    HiUserCircle, HiHome
+} from 'react-icons/hi';
+import { FaBars, FaTimes } from 'react-icons/fa';
 import { useState } from 'react';
 
 const DashboardLayout = () => {
-    const [isDrawerOpen, setDrawerOpen] = useState(false);
+    const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const navLinkStyle = ({ isActive }) =>
         `flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 
      ${isActive ? 'bg-primary text-white' : 'hover:bg-gray-100 text-gray-800'}`;
 
+    const toggleMenu = () => {
+        setMobileMenuOpen(!isMobileMenuOpen);
+    };
+
+    const closeMenu = () => {
+        setMobileMenuOpen(false);
+    };
+
     return (
-        <div className="min-h-screen bg-background text-gray-800 flex flex-col md:flex-row">
+        <div className="min-h-screen bg-background text-gray-800 flex flex-col md:flex-row relative">
+
+            {/* Mobile Top Bar */}
+            <div className="md:hidden flex items-center justify-between   px-4 py-3 fixed top-0 left-0 right-0 z-20">
+                <h2 className="text-xl font-bold text-primary">SecureNest Admin</h2>
+                <button onClick={toggleMenu} className="text-primary text-2xl">
+                    {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+                </button>
+            </div>
 
             {/* Sidebar */}
-            <aside className="w-full md:w-64 bg-white shadow-md z-10 fixed md:static top-0 md:h-screen p-4">
-                <div className="text-2xl font-bold text-primary mb-6 text-center">SecureNest Admin</div>
-                <ul className="space-y-2">
+            <aside
+                className={` shadow-md z-30 fixed top-0 left-0  w-64 p-4 transition-transform transform duration-300 
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
+        md:translate-x-0 md:static md:block`}
+            >
+                <div className="text-2xl font-bold text-primary mb-6 hidden md:block text-center">
+                    SecureNest Admin
+                </div>
+
+                <ul className="space-y-2 mt-12 md:mt-0">
                     <li>
-                        <NavLink to="/dashboard/applications" className={navLinkStyle}>
+                        <NavLink to="/" className={navLinkStyle} onClick={closeMenu}>
+                            <HiHome className="text-xl" />
+                            Home
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/dashboard/applications" className={navLinkStyle} onClick={closeMenu}>
                             <HiDocumentText className="text-xl" />
                             Manage Applications
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/dashboard/users" className={navLinkStyle}>
+                        <NavLink to="/dashboard/users" className={navLinkStyle} onClick={closeMenu}>
                             <HiUserGroup className="text-xl" />
                             Manage Users
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="manage-policies" className={navLinkStyle}>
+                        <NavLink to="/dashboard/manage-policies" className={navLinkStyle} onClick={closeMenu}>
                             <HiClipboardCheck className="text-xl" />
                             Manage Policies
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/dashboard/transactions" className={navLinkStyle}>
+                        <NavLink to="/dashboard/transactions" className={navLinkStyle} onClick={closeMenu}>
                             <HiCurrencyDollar className="text-xl" />
                             Manage Transactions
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/dashboard/agents" className={navLinkStyle}>
+                        <NavLink to="/dashboard/agents" className={navLinkStyle} onClick={closeMenu}>
                             <HiUserCircle className="text-xl" />
                             Manage Agents
                         </NavLink>
@@ -50,7 +86,7 @@ const DashboardLayout = () => {
             </aside>
 
             {/* Content Area */}
-            <main className="flex-1 p-6 mt-20 md:mt-0 md:ml-64 bg-background">
+            <main className="flex-1 p-6 pt-20 md:pt-6 ">
                 <Outlet />
             </main>
         </div>

@@ -2,12 +2,13 @@ import {
     createBrowserRouter,
 } from "react-router";
 import MainLayout from "../layouts/MainLayout.jsx";
-import Home from "../pages/Home/Home.jsx";
+import Home from "../pages/Home/home/Home.jsx";
 import SignIn from "../pages/signIn/SignIn.jsx";
 import SignUp from "../pages/signUp/SignUp.jsx";
 import AuthLayout from "../layouts/AuthLayouts.jsx";
 import DashboardLayout from "../layouts/DashboardLayout.jsx";
 import ManagePolicies from "../pages/DashBoard/ManagePolicies/ManagePolicies.jsx";
+import AllPolicies from "../pages/all policies/AllPolicies.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -18,6 +19,10 @@ export const router = createBrowserRouter([
                 index: true,
                 Component: Home,
             },
+            {
+                path:'all-policies',
+                Component:AllPolicies,
+            }
         ],
     },
     {
