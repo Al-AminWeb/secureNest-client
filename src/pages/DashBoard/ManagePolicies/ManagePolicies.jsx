@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import {useState} from 'react';
+import {useForm} from 'react-hook-form';
 import Swal from 'sweetalert2';
+import useAxiosSecure from "../../../hooks/useAxiosSecure.jsx";
 
 const ManagePolicies = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -8,25 +9,36 @@ const ManagePolicies = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
         reset,
     } = useForm();
 
+    const axiosSecure = useAxiosSecure();
+
+
     const handleAddPolicy = (data) => {
-        // Simulate policy addition (Here you can later call your backend API)
-        console.log(data);
-        Swal.fire({
-            icon: 'success',
-            title: 'Policy Added Successfully!',
-            showConfirmButton: false,
-            timer: 1500,
-        });
+        axiosSecure.post('/policies', data)
+            .then(res => {
+                console.log(res.data);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Policy Added Successfully!',
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
 
-        // Reset form after submission
-        reset();
-        setIsModalOpen(false); // Close the modal
+                reset();
+                setIsModalOpen(false); // Close the modal after success
+            })
+            .catch(error => {
+                console.error('Error adding policy:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Add Policy',
+                    text: 'There was an error while adding the policy. Please try again.',
+                });
+            });
     };
-
     return (
         <div className="space-y-4">
             {/* Button to Open Modal */}
@@ -60,7 +72,7 @@ const ManagePolicies = () => {
                                 <input
                                     type="text"
                                     id="title"
-                                    {...register('title', { required: 'Title is required' })}
+                                    {...register('title', {required: 'Title is required'})}
                                     className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-accent focus:border-accent"
                                 />
                                 {errors.title && <p className="text-red-500 text-xs">{errors.title.message}</p>}
@@ -73,7 +85,7 @@ const ManagePolicies = () => {
                                 </label>
                                 <select
                                     id="category"
-                                    {...register('category', { required: 'Category is required' })}
+                                    {...register('category', {required: 'Category is required'})}
                                     className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-accent focus:border-accent"
                                 >
                                     <option value="term_life">Term Life</option>
@@ -93,10 +105,11 @@ const ManagePolicies = () => {
                                 </label>
                                 <textarea
                                     id="description"
-                                    {...register('description', { required: 'Description is required' })}
+                                    {...register('description', {required: 'Description is required'})}
                                     className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-accent focus:border-accent"
                                 ></textarea>
-                                {errors.description && <p className="text-red-500 text-xs">{errors.description.message}</p>}
+                                {errors.description &&
+                                    <p className="text-red-500 text-xs">{errors.description.message}</p>}
                             </div>
 
                             {/* Minimum Age */}
@@ -107,7 +120,7 @@ const ManagePolicies = () => {
                                 <input
                                     type="number"
                                     id="min_age"
-                                    {...register('min_age', { required: 'Minimum age is required' })}
+                                    {...register('min_age', {required: 'Minimum age is required'})}
                                     className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-accent focus:border-accent"
                                 />
                                 {errors.min_age && <p className="text-red-500 text-xs">{errors.min_age.message}</p>}
@@ -123,7 +136,7 @@ const ManagePolicies = () => {
                                 <input
                                     type="number"
                                     id="max_age"
-                                    {...register('max_age', { required: 'Maximum age is required' })}
+                                    {...register('max_age', {required: 'Maximum age is required'})}
                                     className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-accent focus:border-accent"
                                 />
                                 {errors.max_age && <p className="text-red-500 text-xs">{errors.max_age.message}</p>}
@@ -137,7 +150,7 @@ const ManagePolicies = () => {
                                 <input
                                     type="text"
                                     id="coverage_range"
-                                    {...register('coverage_range', { required: 'Coverage range is required' })}
+                                    {...register('coverage_range', {required: 'Coverage range is required'})}
                                     className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-accent focus:border-accent"
                                 />
                                 {errors.coverage_range && (
@@ -155,7 +168,7 @@ const ManagePolicies = () => {
                                 <input
                                     type="text"
                                     id="duration"
-                                    {...register('duration', { required: 'Duration is required' })}
+                                    {...register('duration', {required: 'Duration is required'})}
                                     className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-accent focus:border-accent"
                                 />
                                 {errors.duration && <p className="text-red-500 text-xs">{errors.duration.message}</p>}
@@ -169,7 +182,7 @@ const ManagePolicies = () => {
                                 <input
                                     type="number"
                                     id="base_premium"
-                                    {...register('base_premium', { required: 'Base premium rate is required' })}
+                                    {...register('base_premium', {required: 'Base premium rate is required'})}
                                     className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-accent focus:border-accent"
                                 />
                                 {errors.base_premium && (
