@@ -9,6 +9,7 @@ import AuthLayout from "../layouts/AuthLayouts.jsx";
 import DashboardLayout from "../layouts/DashboardLayout.jsx";
 import ManagePolicies from "../pages/DashBoard/ManagePolicies/ManagePolicies.jsx";
 import AllPolicies from "../pages/all policies/AllPolicies.jsx";
+import PolicyDetails from "../pages/policy details/PolicyDetails.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -22,6 +23,10 @@ export const router = createBrowserRouter([
             {
                 path:'all-policies',
                 Component:AllPolicies,
+            },
+            {
+                path: 'policies/:policyId',
+                Component:PolicyDetails
             }
         ],
     },
