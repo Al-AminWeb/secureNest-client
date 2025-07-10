@@ -11,6 +11,7 @@ import ManagePolicies from "../pages/DashBoard/ManagePolicies/ManagePolicies.jsx
 import AllPolicies from "../pages/all policies/AllPolicies.jsx";
 import PolicyDetails from "../pages/policy details/PolicyDetails.jsx";
 import QuoteEstimator from "../pages/qoute/QuoteEstimator.jsx";
+import ApplicationForm from "../pages/ApplicationForm/ApplicationForm.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -32,6 +33,10 @@ export const router = createBrowserRouter([
             {
                 path: 'quote',
                 Component: QuoteEstimator
+            },
+            {
+                path: 'apply',
+                Component:ApplicationForm
             }
         ],
     },
