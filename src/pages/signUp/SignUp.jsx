@@ -6,11 +6,15 @@ import { FcGoogle } from 'react-icons/fc';
 import Swal from 'sweetalert2';
 import { AuthContext } from '../../contexts/AuthContext.jsx';
 import { use } from 'react';
+import {FaUpload} from "react-icons/fa";
+import axios from "axios";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { createUser, updateUser, setUser } = use(AuthContext);
+  const [photo, setPhoto] = useState(null);
   const navigate = useNavigate();
+  const [profilePic, setProfilePic] =useState('')
 
   const {
     register,
@@ -24,10 +28,15 @@ const Register = () => {
 
     try {
       const result = await createUser(email, password);
-      const photoURL = photo[0] ? URL.createObjectURL(photo[0]) : '';
 
-      await updateUser({ displayName: name, photoURL });
-      setUser({ ...result.user, displayName: name, photoURL });
+      //upload user info in the database
+
+      //update user profile in the firebase
+
+      await updateUser({ displayName: name, photoURL: profilePic });
+
+      // ✅ Update local user context
+      setUser({ ...result.user, displayName: name, photoURL: profilePic });
 
       Swal.fire({
         icon: 'success',
@@ -45,6 +54,19 @@ const Register = () => {
         text: error.message,
       });
     }
+  };
+  const handlePhotoChange = async (e) => {
+    const image = e.target.files[0];
+    console.log(image);
+    if (image) {
+      setPhoto(URL.createObjectURL(image)); // Show the selected photo as a preview
+    }
+
+    const data = new FormData();
+    data.append('image', image);
+    const imageUploadUrl = `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_image_upload_key}`
+    const res =await axios.post(imageUploadUrl,data)
+    setProfilePic(res.data.data.url);
   };
 
   return (
@@ -80,14 +102,28 @@ const Register = () => {
 
               {/* Photo */}
               <div>
-                <label htmlFor="photo" className="block text-sm font-medium text-gray-700">Photo</label>
-                <input
-                    id="photo"
-                    type="file"
-                    accept="image/*"
-                    {...register('photo')}
-                    className="mt-1 block w-full px-4 py-2 border rounded-md"
-                />
+                <label htmlFor="photo" className="block text-sm font-medium text-gray-700 mb-2">Upload Photo</label>
+                <div className="flex items-center gap-3">
+                  {/* Custom file upload button with an icon */}
+                  <label
+                      htmlFor="photo"
+                      className="inline-flex items-center px-4 py-2 bg-accent text-white rounded-md cursor-pointer hover:bg-teal-600 transition-all"
+                  >
+                    <FaUpload className="mr-2" /> Upload Image
+                  </label>
+                  {/* Hidden file input */}
+                  <input
+                      id="photo"
+                      type="file"
+                      accept="image/*"
+                      {...register('photo')}
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                  />
+                  {photo && <img src={photo} alt="Preview" className="w-16 h-16 rounded-full object-cover border" />}
+
+                </div>
+                {errors.photo && <p className="text-red-500 text-sm">{errors.photo.message}</p>}
               </div>
 
               {/* Email */}
