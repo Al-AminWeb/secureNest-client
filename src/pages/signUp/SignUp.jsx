@@ -8,6 +8,7 @@ import { AuthContext } from '../../contexts/AuthContext.jsx';
 import { use } from 'react';
 import {FaUpload} from "react-icons/fa";
 import axios from "axios";
+import useAxios from "../../hooks/useAxios.jsx";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,6 +16,7 @@ const Register = () => {
   const [photo, setPhoto] = useState(null);
   const navigate = useNavigate();
   const [profilePic, setProfilePic] =useState('')
+  const axiosInstance = useAxios();
 
   const {
     register,
@@ -29,9 +31,15 @@ const Register = () => {
     try {
       const result = await createUser(email, password);
 
-      //upload user info in the database
+      const userInfo = {
+        email:data.email,
+        role:'user',
+        createdAt:new Date().toISOString(),
+        lastLogIn:new Date().toISOString(),
+      }
 
-      //update user profile in the firebase
+      const userRes  = await axiosInstance.post('/users',userInfo);
+      console.log(userRes.data);
 
       await updateUser({ displayName: name, photoURL: profilePic });
 
