@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import {useNavigate, useParams} from 'react-router';
 
 const QuoteEstimator = () => {
+    const { policyId } = useParams();
     const [formData, setFormData] = useState({
         age: '',
         gender: 'male',
@@ -103,7 +104,7 @@ const QuoteEstimator = () => {
                     <p>Monthly: <span className="font-bold">৳{quote.monthly}</span></p>
                     <p>Annual: <span className="font-bold">৳{quote.annual}</span></p>
                     <button
-                        onClick={() => navigate('/apply')}
+                        onClick={() => navigate(`/policies/${policyId}/apply`)}
                         className="btn btn-accent mt-4 bg-accent p-2 rounded-xl"
                     >
                         Apply for Policy

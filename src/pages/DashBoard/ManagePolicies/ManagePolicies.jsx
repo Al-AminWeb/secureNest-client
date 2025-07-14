@@ -14,8 +14,9 @@ const ManagePolicies = () => {
     // Fetch policies
     useEffect(() => {
         axiosSecure.get('/policies')
-            .then(res => setPolicies(res.data))
-            .catch(err => console.error("Error fetching policies:", err));
+            .then(res => setPolicies(res.data.policies))
+            .catch(err => console.error("Error fetching policies:", err))
+    .catch(err => console.error("Error fetching policies:", err));
     }, [axiosSecure]);
 
     // Add or Edit policy

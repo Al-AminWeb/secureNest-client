@@ -4,14 +4,26 @@ import { NavLink } from 'react-router';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { FcGoogle } from 'react-icons/fc';
 import Swal from "sweetalert2";
-import useAuth from "../../hooks/useAuth.js";
+import useAuth from "../../hooks/useAuth.jsx";
+import useAxios from "../../hooks/useAxios.jsx";
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { signIn,signInWithGoogle } = useAuth();
+  const axiosInstance = useAxios();
   const handleGoogleSignIn = ()=>{
     signInWithGoogle()
-        .then((result)=>{
+        .then(async (result)=>{
+          const user = result.user;
+          const userInfo = {
+            email:user.email,
+            role:'user',
+            createdAt:new Date().toISOString(),
+            lastLogIn:new Date().toISOString(),
+          }
+          const res = await axiosInstance.post('/users',userInfo)
+          console.log(res.data.data)
+
           console.log(result);
         })
     .catch((error)=>{

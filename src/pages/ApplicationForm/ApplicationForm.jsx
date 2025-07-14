@@ -1,16 +1,53 @@
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
+import { useParams } from 'react-router';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
+import { useState, useEffect } from 'react';
 
 const ApplicationForm = () => {
+    const { policyId } = useParams();  // Get policyId from URL
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const axiosSecure = useAxiosSecure();
+    const [policyDetails, setPolicyDetails] = useState(null);
+
+    // Fetch policy data based on policyId
+    useEffect(() => {
+        const fetchPolicyDetails = async () => {
+            try {
+                const res = await axiosSecure.get(`/policies/${policyId}`);
+                setPolicyDetails(res.data);
+            } catch (error) {
+                console.error('Error fetching policy details:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to load policy details',
+                    text: 'Please try again later.',
+                });
+            }
+        };
+
+        fetchPolicyDetails();
+    }, [policyId]);
 
     const onSubmit = async (data) => {
+        if (!policyDetails) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Policy details not found',
+                text: 'Unable to submit the application without policy details.',
+            });
+            return;
+        }
+
         const application = {
             ...data,
-            status: 'Pending',
-            healthDisclosure: data.healthDisclosure || [], // ensure array
+            status: 'Pending',  // Store the application status as "Pending"
+            healthDisclosure: data.healthDisclosure || [], // Ensure it's an array
+            policyId,  // Store the policyId to link this application to the policy
+            policyName: policyDetails.title,  // Include policy name
+            coverage: policyDetails.coverage_range,  // Include policy coverage
+            premium: policyDetails.base_premium,  // Include policy premium
+            duration: policyDetails.duration,  // Include policy duration
         };
 
         try {
@@ -41,7 +78,6 @@ const ApplicationForm = () => {
         <div className="max-w-4xl mx-auto px-4 py-8 bg-white shadow-lg rounded-xl border border-gray-200">
             <h2 className="text-3xl font-bold text-center text-primary mb-8">Insurance Application Form</h2>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-
                 {/* Personal Info */}
                 <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">

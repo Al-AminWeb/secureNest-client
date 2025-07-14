@@ -12,6 +12,9 @@ import AllPolicies from "../pages/all policies/AllPolicies.jsx";
 import PolicyDetails from "../pages/policy details/PolicyDetails.jsx";
 import QuoteEstimator from "../pages/qoute/QuoteEstimator.jsx";
 import ApplicationForm from "../pages/ApplicationForm/ApplicationForm.jsx";
+import ManageUsers from "../pages/DashBoard/ManageUsers/ManageUsers.jsx";
+import ManageApplications from "../pages/DashBoard/ManageApplications/ManageApplications.jsx";
+import MyPolicies from "../pages/DashBoard/MyPolicies/MyPolicies.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -23,20 +26,20 @@ export const router = createBrowserRouter([
                 Component: Home,
             },
             {
-                path:'all-policies',
-                Component:AllPolicies,
+                path: 'all-policies',
+                Component: AllPolicies,
             },
             {
                 path: 'policies/:policyId',
-                Component:PolicyDetails
+                Component: PolicyDetails
             },
             {
-                path: 'quote',
+                path: 'policies/:policyId/quote',
                 Component: QuoteEstimator
             },
             {
-                path: 'apply',
-                Component:ApplicationForm
+                path: 'policies/:policyId/apply',
+                Component: ApplicationForm
             }
         ],
     },
@@ -55,13 +58,26 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        path:'/dashboard',
+        path: '/dashboard',
         Component: DashboardLayout,
         children:
-        [
+            [
+                {
+                    path: 'manage-policies',
+                    Component: ManagePolicies,
+                },
+                {
+                    path: 'manage-users',
+                    element: <ManageUsers/>,
+                },
+                {
+                    path: 'manage-applications',
+                    element: <ManageApplications/>,
+                },
+                    // user
             {
-                path:'manage-policies',
-                Component:ManagePolicies,
+                path: 'my-policies',
+                element: <MyPolicies/>,
             }
 
         ]

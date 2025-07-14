@@ -61,7 +61,7 @@ const PolicyDetails = () => {
                 {/* CTA Buttons */}
                 <div className="mt-8 flex flex-wrap gap-4 justify-start">
                     <button
-                        onClick={() => navigate('/quote')}
+                        onClick={() => navigate(`/policies/${policyId}/quote`)}
                         className="px-6 py-2 bg-accent text-white rounded-md hover:bg-teal-600 transition"
                     >
                         Get Quote
