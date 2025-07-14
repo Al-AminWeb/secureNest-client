@@ -134,7 +134,7 @@ const Header = () => {
                         </li>
                         <li>
                             <NavLink
-                                to="/faqs"
+                                to="/faq"
                                 className={({ isActive }) =>
                                     `block py-2 px-3 rounded ${
                                         isActive ? 'text-accent' : 'text-gray-700 dark:text-white'

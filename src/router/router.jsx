@@ -15,6 +15,7 @@ import ApplicationForm from "../pages/ApplicationForm/ApplicationForm.jsx";
 import ManageUsers from "../pages/DashBoard/ManageUsers/ManageUsers.jsx";
 import ManageApplications from "../pages/DashBoard/ManageApplications/ManageApplications.jsx";
 import MyPolicies from "../pages/DashBoard/MyPolicies/MyPolicies.jsx";
+import FAQ from "../pages/Home/faq/FAQ.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -40,6 +41,11 @@ export const router = createBrowserRouter([
             {
                 path: 'policies/:policyId/apply',
                 Component: ApplicationForm
+            },
+            {
+                path:'faq',
+                Component:FAQ
+
             }
         ],
     },
