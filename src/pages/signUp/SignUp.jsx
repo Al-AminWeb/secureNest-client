@@ -32,6 +32,7 @@ const Register = () => {
       const result = await createUser(email, password);
 
       const userInfo = {
+        name:data.name,
         email:data.email,
         role:'user',
         createdAt:new Date().toISOString(),

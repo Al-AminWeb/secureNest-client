@@ -6,10 +6,10 @@ const ManageApplications = () => {
     const axiosSecure = useAxiosSecure();
 
     useEffect(() => {
-        // Fetch applications with populated policy names when the component mounts
+        // Fetch all applications when the component mounts
         const fetchApplications = async () => {
             try {
-                const response = await axiosSecure.get("/applications");
+                const response = await axiosSecure.get("/applications"); // No email query needed for admin
                 setApplications(response.data);
             } catch (error) {
                 console.error("Error fetching applications:", error);

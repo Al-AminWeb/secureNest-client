@@ -16,6 +16,8 @@ import ManageUsers from "../pages/DashBoard/ManageUsers/ManageUsers.jsx";
 import ManageApplications from "../pages/DashBoard/ManageApplications/ManageApplications.jsx";
 import MyPolicies from "../pages/DashBoard/MyPolicies/MyPolicies.jsx";
 import FAQ from "../pages/Home/faq/FAQ.jsx";
+import ManageBlogs from "../pages/DashBoard/manage blogs/ManageBlogs.jsx";
+import CreateBlog from "../pages/DashBoard/create blog/CreateBlog.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -43,8 +45,8 @@ export const router = createBrowserRouter([
                 Component: ApplicationForm
             },
             {
-                path:'faq',
-                Component:FAQ
+                path: 'faq',
+                Component: FAQ
 
             }
         ],
@@ -80,12 +82,21 @@ export const router = createBrowserRouter([
                     path: 'manage-applications',
                     element: <ManageApplications/>,
                 },
-                    // user
-            {
-                path: 'my-policies',
-                element: <MyPolicies/>,
-            }
+                // user
+                {
+                    path: 'my-policies',
+                    element: <MyPolicies/>,
+                },
 
-        ]
+                // agent
+                {
+                    path: 'manage-blogs',
+                    element: <ManageBlogs/>,
+                },
+                {
+                    path:'manage-blogs/create',
+                    element: <CreateBlog />,
+                }
+            ]
     }
 ])

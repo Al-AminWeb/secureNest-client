@@ -26,7 +26,6 @@ const DashboardLayout = () => {
     };
 
     const {role} = useUserRole();
-    console.log(role);
 
     return (
         <div className="min-h-screen bg-background text-gray-800 flex flex-col md:flex-row relative">

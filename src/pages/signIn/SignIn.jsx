@@ -16,6 +16,7 @@ const SignIn = () => {
         .then(async (result)=>{
           const user = result.user;
           const userInfo = {
+            name:user.name,
             email:user.email,
             role:'user',
             createdAt:new Date().toISOString(),
