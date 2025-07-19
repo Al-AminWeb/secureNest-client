@@ -1,10 +1,11 @@
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
+import useAxios from "../../../hooks/useAxios.jsx";
 import Swal from 'sweetalert2';
 import useAuth from "../../../hooks/useAuth.jsx";
 
 const CreateBlog = () => {
     const { user } = useAuth();  // Get the logged-in user's data (which includes displayName)
+    const axiosInstance = useAxios();
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
     const onSubmit = async (data) => {
@@ -15,7 +16,7 @@ const CreateBlog = () => {
         };
 
         try {
-            const res = await axios.post('/blogs', blogData); // Send blog data to the backend
+            const res = await axiosInstance.post('/blogs', blogData); // Send blog data to the backend
             if (res.status === 201 || res.data.insertedId) {
                 Swal.fire({
                     icon: "success",
