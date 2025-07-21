@@ -9,23 +9,23 @@ const statusColors = {
 };
 
 const ManageApplications = () => {
-  const [applications, setApplications] = useState([]);
+    const [applications, setApplications] = useState([]);
   const [agents, setAgents] = useState([]);
   const [selectedAgents, setSelectedAgents] = useState({});
   const [loading, setLoading] = useState(true);
-  const axiosSecure = useAxiosSecure();
+    const axiosSecure = useAxiosSecure();
 
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
+    useEffect(() => {
+        const fetchApplications = async () => {
+            try {
         const response = await axiosSecure.get("/applications");
-        setApplications(response.data);
-      } catch (error) {
-        console.error("Error fetching applications:", error);
+                setApplications(response.data);
+            } catch (error) {
+                console.error("Error fetching applications:", error);
       } finally {
         setLoading(false);
-      }
-    };
+            }
+        };
     const fetchAgents = async () => {
       try {
         const response = await axiosSecure.get("/agents");
@@ -34,9 +34,9 @@ const ManageApplications = () => {
         console.error("Error fetching agents:", error);
       }
     };
-    fetchApplications();
+        fetchApplications();
     fetchAgents();
-  }, [axiosSecure]);
+    }, [axiosSecure]);
 
   const handleAgentChange = (applicationId, agentId) => {
     setSelectedAgents((prev) => ({ ...prev, [applicationId]: agentId }));
@@ -62,7 +62,7 @@ const ManageApplications = () => {
     }
   };
 
-  return (
+    return (
     <div className="max-w-7xl mx-auto p-4">
       <h2 className="text-3xl font-bold mb-6 text-center text-primary">Manage Insurance Applications</h2>
       <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
@@ -75,7 +75,7 @@ const ManageApplications = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full table-auto border-collapse">
-              <thead>
+                <thead>
                 <tr className="bg-gray-50 sticky top-0 z-10">
                   <th className="py-3 px-4 border-b font-semibold">Applicant Name</th>
                   <th className="py-3 px-4 border-b font-semibold">Email</th>
@@ -84,8 +84,8 @@ const ManageApplications = () => {
                   <th className="py-3 px-4 border-b font-semibold">Status</th>
                   <th className="py-3 px-4 border-b font-semibold">Actions</th>
                 </tr>
-              </thead>
-              <tbody>
+                </thead>
+                <tbody>
                 {applications.map((application, idx) => (
                   <tr
                     key={application._id}
@@ -99,8 +99,8 @@ const ManageApplications = () => {
                     <td className="py-3 px-4 border-b">{application.email}</td>
                     <td className="py-3 px-4 border-b">{application.policyName}</td>
                     <td className="py-3 px-4 border-b">
-                      {new Date(application.createdAt).toLocaleDateString()}
-                    </td>
+                            {new Date(application.createdAt).toLocaleDateString()}
+                        </td>
                     <td className="py-3 px-4 border-b">
                       <span
                         className={`inline-block px-3 py-1 rounded-full border text-xs font-semibold ${
@@ -149,18 +149,18 @@ const ManageApplications = () => {
                           title="Reject Application"
                         >
                           <FaTimesCircle /> <span className="hidden md:inline">Reject</span>
-                        </button>
+                            </button>
                       </div>
-                    </td>
-                  </tr>
+                        </td>
+                    </tr>
                 ))}
-              </tbody>
+                </tbody>
             </table>
           </div>
         )}
       </div>
-    </div>
-  );
+        </div>
+    );
 };
 
 export default ManageApplications;

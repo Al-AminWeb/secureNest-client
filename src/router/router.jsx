@@ -18,6 +18,8 @@ import MyPolicies from "../pages/DashBoard/MyPolicies/MyPolicies.jsx";
 import FAQ from "../pages/Home/faq/FAQ.jsx";
 import ManageBlogs from "../pages/DashBoard/manage blogs/ManageBlogs.jsx";
 import CreateBlog from "../pages/DashBoard/create blog/CreateBlog.jsx";
+import AllBlogs from "../pages/Home/blogs/AllBlogs.jsx";
+import BlogDetails from "../pages/Home/blogs/BlogDetails.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -48,7 +50,15 @@ export const router = createBrowserRouter([
                 path: 'faq',
                 Component: FAQ
 
-            }
+            },
+            {
+                path: 'blogs',
+                Component: AllBlogs,
+            },
+            {
+                path: 'blogs/:id',
+                Component: BlogDetails,
+            },
         ],
     },
     {

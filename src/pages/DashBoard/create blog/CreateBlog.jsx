@@ -53,6 +53,17 @@ const CreateBlog = () => {
                     {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
                 </div>
 
+                {/* Image URL Field */}
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Image URL</label>
+                    <input
+                        {...register('image', { required: 'Image URL is required' })}
+                        className="input input-bordered w-full p-3 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="https://example.com/image.jpg"
+                    />
+                    {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}
+                </div>
+
                 {/* Content Field */}
                 <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">Content</label>
