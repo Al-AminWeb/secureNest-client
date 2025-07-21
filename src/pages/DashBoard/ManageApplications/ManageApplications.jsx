@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { FaEye, FaUserCheck, FaTimesCircle } from "react-icons/fa";
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router';
 
 const statusColors = {
   Approved: "bg-green-100 text-green-700 border-green-300",
@@ -13,7 +15,10 @@ const ManageApplications = () => {
   const [agents, setAgents] = useState([]);
   const [selectedAgents, setSelectedAgents] = useState({});
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState(null);
     const axiosSecure = useAxiosSecure();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchApplications = async () => {
@@ -47,9 +52,19 @@ const ManageApplications = () => {
     if (!agentId) return;
     try {
       await axiosSecure.patch(`/applications/${applicationId}/assign-agent`, { agentId });
-      setApplications((prev) => prev.map(app => app._id === applicationId ? { ...app, agentId } : app));
+      setApplications((prev) => prev.map(app => app._id === applicationId ? { ...app, agentId, status: "Approved" } : app));
+      Swal.fire({
+        icon: 'success',
+        title: 'Agent Assigned',
+        text: 'Agent has been assigned and application approved!'
+      });
     } catch (error) {
       console.error("Error assigning agent:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Assignment Failed',
+        text: 'Failed to assign agent. Please try again.'
+      });
     }
   };
 
@@ -57,9 +72,31 @@ const ManageApplications = () => {
     try {
       await axiosSecure.patch(`/applications/${applicationId}/status`, { status: "Rejected" });
       setApplications((prev) => prev.map(app => app._id === applicationId ? { ...app, status: "Rejected" } : app));
+      Swal.fire({
+        icon: 'success',
+        title: 'Application Rejected',
+        text: 'The application has been rejected.'
+      });
     } catch (error) {
       console.error("Error rejecting application:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Rejection Failed',
+        text: 'Failed to reject application. Please try again.'
+      });
     }
+  };
+
+  // Replace handleView to open modal
+  const handleView = (applicationId) => {
+    const app = applications.find(a => a._id === applicationId);
+    setSelectedApplication(app);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedApplication(null);
   };
 
     return (
@@ -116,6 +153,7 @@ const ManageApplications = () => {
                         <button
                           className="flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium px-2 py-1 rounded transition"
                           title="View Details"
+                          onClick={() => handleView(application._id)}
                         >
                           <FaEye /> <span className="hidden md:inline">View</span>
                         </button>
@@ -159,7 +197,43 @@ const ManageApplications = () => {
           </div>
         )}
       </div>
-        </div>
+      {/* Modal for Application Details */}
+      {modalOpen && selectedApplication && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            {/* 👇 Blurry Transparent Background Layer */}
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
+
+            {/* 👇 Modal Content */}
+            <div className="relative z-50 bg-white rounded-lg shadow-lg max-w-lg w-full p-6">
+              <button
+                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                  onClick={closeModal}
+                  title="Close"
+              >
+                &times;
+              </button>
+              <h3 className="text-xl font-bold mb-4 text-primary">Application Details</h3>
+              <div className="space-y-2">
+                <div><span className="font-semibold">Applicant Name:</span> {selectedApplication.name}</div>
+                <div><span className="font-semibold">Email:</span> {selectedApplication.email}</div>
+                <div><span className="font-semibold">Address:</span> {selectedApplication.address}</div>
+                <div><span className="font-semibold">NID:</span> {selectedApplication.nid}</div>
+                <div><span className="font-semibold">Policy Name:</span> {selectedApplication.policyName}</div>
+                <div><span className="font-semibold">Coverage:</span> {selectedApplication.coverage}</div>
+                <div><span className="font-semibold">Premium:</span> {selectedApplication.premium}</div>
+                <div><span className="font-semibold">Duration:</span> {selectedApplication.duration}</div>
+                <div><span className="font-semibold">Nominee Name:</span> {selectedApplication.nomineeName}</div>
+                <div><span className="font-semibold">Nominee Relation:</span> {selectedApplication.nomineeRelation}</div>
+                <div><span className="font-semibold">Health Disclosure:</span> {selectedApplication.healthDisclosure}</div>
+                <div><span className="font-semibold">Status:</span> {selectedApplication.status}</div>
+                <div><span className="font-semibold">Created At:</span> {new Date(selectedApplication.createdAt).toLocaleString()}</div>
+                <div><span className="font-semibold">Last Updated:</span> {selectedApplication.lastUpdated ? new Date(selectedApplication.lastUpdated).toLocaleString() : 'N/A'}</div>
+              </div>
+            </div>
+          </div>
+      )}
+
+    </div>
     );
 };
 

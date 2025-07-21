@@ -145,18 +145,34 @@ const Header = () => {
                             </NavLink>
                         </li>
                         {user && (
-                            <li>
-                                <NavLink
-                                    to="/dashboard"
-                                    className={({ isActive }) =>
-                                        `block py-2 px-3 rounded ${
-                                            isActive ? 'text-accent' : 'text-gray-700 dark:text-white'
-                                        } hover:text-accent`
-                                    }
-                                >
-                                    Dashboard
-                                </NavLink>
-                            </li>
+                            <>
+                                <li>
+                                    <NavLink
+                                        to="/dashboard"
+                                        className={({ isActive }) =>
+                                            `block py-2 px-3 rounded ${
+                                                isActive ? 'text-accent' : 'text-gray-700 dark:text-white'
+                                            } hover:text-accent`
+                                        }
+                                    >
+                                        Dashboard
+                                    </NavLink>
+                                </li>
+
+                                <li>
+                                    <NavLink
+                                        to="/become-agent"
+                                        className={({ isActive }) =>
+                                            `block py-2 px-3 rounded ${
+                                                isActive ? 'text-accent' : 'text-gray-700 dark:text-white'
+                                            } hover:text-accent`
+                                        }
+                                    >
+                                        Become an Agent
+                                    </NavLink>
+                                </li>
+
+                            </>
                         )}
                     </ul>
                 </div>

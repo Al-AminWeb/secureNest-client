@@ -89,40 +89,43 @@ const ManagePolicies = () => {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-                <table className="table w-full text-center">
-                    <thead className="bg-accent text-white text-sm uppercase">
+            {/* Table */}
+            <div className="overflow-x-auto bg-white shadow-xl rounded-lg">
+                <table className="min-w-full divide-y divide-gray-200 text-sm text-gray-800">
+                    <thead className="bg-gradient-to-r from-blue-500 to-teal-500 text-white text-left">
                     <tr>
                         <th className="py-3 px-4">Policy Title</th>
                         <th className="py-3 px-4">Category</th>
-                        <th className="py-3 px-4">Actions</th>
+                        <th className="py-3 px-4 text-center">Actions</th>
                     </tr>
                     </thead>
-                    <tbody className="text-gray-800">
+                    <tbody>
                     {policies.length > 0 ? (
                         policies.map((policy) => (
-                            <tr key={policy._id} className="hover:bg-gray-50 transition">
-                                <td className="py-2 px-4">{policy.title}</td>
-                                <td className="py-2 px-4 capitalize">{policy.category}</td>
-                                <td className="py-2 px-4 space-x-2">
-                                    <button
-                                        onClick={() => handleEditPolicy(policy)}
-                                        className="text-blue-600 hover:underline font-medium"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => handleDeletePolicy(policy._id)}
-                                        className="text-red-600 hover:underline font-medium"
-                                    >
-                                        Delete
-                                    </button>
+                            <tr key={policy._id} className="hover:bg-gray-100 transition">
+                                <td className="py-3 px-4">{policy.title}</td>
+                                <td className="py-3 px-4 capitalize">{policy.category}</td>
+                                <td className="py-3 px-4 text-center">
+                                    <div className="flex flex-col md:flex-row gap-2 justify-center items-center">
+                                        <button
+                                            onClick={() => handleEditPolicy(policy)}
+                                            className="inline-flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium shadow"
+                                        >
+                                            ✏️ Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeletePolicy(policy._id)}
+                                            className="inline-flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium shadow"
+                                        >
+                                            🗑️ Delete
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan="3" className="py-4 text-gray-500">
+                            <td colSpan="3" className="py-6 text-center text-gray-500">
                                 No policies found.
                             </td>
                         </tr>
@@ -130,6 +133,7 @@ const ManagePolicies = () => {
                     </tbody>
                 </table>
             </div>
+
 
             {/* Modal */}
             {isModalOpen && (

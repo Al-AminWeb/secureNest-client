@@ -20,6 +20,8 @@ import ManageBlogs from "../pages/DashBoard/manage blogs/ManageBlogs.jsx";
 import CreateBlog from "../pages/DashBoard/create blog/CreateBlog.jsx";
 import AllBlogs from "../pages/Home/blogs/AllBlogs.jsx";
 import BlogDetails from "../pages/Home/blogs/BlogDetails.jsx";
+import BecomeAnAgent from "../pages/become agent/BecomeAnAgent.jsx";
+import ManageAgent from "../pages/DashBoard/ManageAgent/ManageAgent.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -59,6 +61,9 @@ export const router = createBrowserRouter([
                 path: 'blogs/:id',
                 Component: BlogDetails,
             },
+            {
+
+            }
         ],
     },
     {
@@ -73,6 +78,10 @@ export const router = createBrowserRouter([
                 path: 'signup',
                 Component: SignUp,
             },
+            {
+                path:'become-agent',
+                element:<BecomeAnAgent />,
+            }
         ]
     },
     {
@@ -91,6 +100,10 @@ export const router = createBrowserRouter([
                 {
                     path: 'manage-applications',
                     element: <ManageApplications/>,
+                },
+                {
+                  path:'manage-agents',
+                    element: <ManageAgent/>,
                 },
                 // user
                 {

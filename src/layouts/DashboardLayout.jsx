@@ -83,7 +83,7 @@ const DashboardLayout = () => {
                                 </NavLink>
                             </li>
                             <li>
-                                <NavLink to="/dashboard/agents" className={navLinkStyle} onClick={closeMenu}>
+                                <NavLink to="/dashboard/manage-agents" className={navLinkStyle} onClick={closeMenu}>
                                     <HiUserCircle className="text-xl"/>
                                     Manage Agents
                                 </NavLink>
