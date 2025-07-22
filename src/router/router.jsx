@@ -22,6 +22,7 @@ import AllBlogs from "../pages/Home/blogs/AllBlogs.jsx";
 import BlogDetails from "../pages/Home/blogs/BlogDetails.jsx";
 import BecomeAnAgent from "../pages/become agent/BecomeAnAgent.jsx";
 import ManageAgent from "../pages/DashBoard/ManageAgent/ManageAgent.jsx";
+import PaymentStatus from "../pages/DashBoard/payment status/PaymentStatus.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -110,6 +111,11 @@ export const router = createBrowserRouter([
                     path: 'my-policies',
                     element: <MyPolicies/>,
                 },
+                {
+                    path: 'payment-status',
+                    element: <PaymentStatus/>,
+                },
+
 
                 // agent
                 {
