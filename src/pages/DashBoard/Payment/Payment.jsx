@@ -6,12 +6,11 @@ import { Elements } from "@stripe/react-stripe-js";
 import { useParams } from 'react-router';
 import PaymentForm from "../payment status/PaymentFrom.jsx";
 
-const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
+const stripePromise = loadStripe(import.meta.env.VITE_payment_key);
 
 const Payment = () => {
-    const { id } = useParams(); // This should be the application ID from the URL
+    const { id } = useParams();
 
-    console.log('Payment component received id:', id); // Debug log
 
     return (
         <Elements stripe={stripePromise}>

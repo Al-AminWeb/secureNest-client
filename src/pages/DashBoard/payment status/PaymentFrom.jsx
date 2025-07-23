@@ -1,5 +1,4 @@
-// PaymentForm.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import {
     CardNumberElement,
     CardExpiryElement,
@@ -12,6 +11,9 @@ import { useQuery } from '@tanstack/react-query';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import PolicySkeleton from '../../shared/loading/PolicySkeleton';
 import { toast } from 'react-hot-toast';
+import Swal from 'sweetalert2';
+import useAuth from "../../../hooks/useAuth.jsx";
+
 
 const CARD_OPTIONS = {
     style: {
@@ -29,14 +31,13 @@ const CARD_OPTIONS = {
     },
 };
 
-const PaymentForm = ({ applicationId }) => {  // Changed prop name to be explicit
+const PaymentForm = ({ applicationId }) => {
     const stripe = useStripe();
     const elements = useElements();
     const navigate = useNavigate();
     const axiosSecure = useAxiosSecure();
-
-    console.log('PaymentForm received applicationId:', applicationId); // Debug log
-
+    const [processing, setProcessing] = useState(false);
+    const {user} = useAuth()
     const {
         isLoading,
         data: application = {},
@@ -46,7 +47,6 @@ const PaymentForm = ({ applicationId }) => {  // Changed prop name to be explici
         queryFn: async () => {
             try {
                 const res = await axiosSecure.get(`/applications/${applicationId}`);
-                console.log('Application data:', res.data); // Debug log
                 return res.data;
             } catch (err) {
                 toast.error('Failed to load application details');
@@ -58,59 +58,120 @@ const PaymentForm = ({ applicationId }) => {  // Changed prop name to be explici
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setProcessing(true);
 
         if (!stripe || !elements) {
-            toast.error('Stripe not initialized');
+            Swal.fire({
+                icon: 'error',
+                title: 'Payment System Not Ready',
+                text: 'Please try again later',
+            });
+            setProcessing(false);
             return;
         }
 
         const cardElement = elements.getElement(CardNumberElement);
         if (!cardElement) {
-            toast.error('Card details not found');
+            Swal.fire({
+                icon: 'error',
+                title: 'Card Details Missing',
+                text: 'Please enter your card information',
+            });
+            setProcessing(false);
             return;
         }
 
         try {
-            // 1. Create payment method
+            // Show loading SweetAlert
+            Swal.fire({
+                title: 'Processing Payment',
+                html: 'Please wait while we process your payment',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Create payment method
             const { error: pmError, paymentMethod } = await stripe.createPaymentMethod({
                 type: 'card',
                 card: cardElement,
+                billing_details: {
+                    name: application.name || 'Customer'
+                }
             });
 
-            if (pmError) {
-                toast.error(pmError.message);
-                return;
-            }
+            if (pmError) throw pmError;
 
-            // 2. Create payment intent (using application data)
+            // Create payment intent
             const paymentIntentRes = await axiosSecure.post('/create-payment-intent', {
-                applicationId: application._id,  // Using the application ID from fetched data
-                paymentMethodId: paymentMethod.id,
-                amount: parseFloat(application.monthlyPayment) * 100, // Convert to cents
+                applicationId: application._id,
+                amount: Math.round(parseFloat(application.monthlyPayment) * 100),
+                currency: 'bdt',
+                metadata: {
+                    applicationId: application._id,
+                    policyName: application.policyName
+                }
             });
 
-            // 3. Confirm the payment
+            // Confirm payment
             const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(
                 paymentIntentRes.data.clientSecret,
                 {
                     payment_method: paymentMethod.id,
+                    receipt_email: application.customerEmail || undefined
                 }
             );
 
-            if (confirmError) {
-                toast.error(confirmError.message);
-            } else if (paymentIntent.status === 'succeeded') {
-                toast.success('Payment successful!');
-                // 4. Update application status
-                await axiosSecure.patch(`/applications/${application._id}/payment`, {
+            if (confirmError) throw confirmError;
+
+            // Handle successful payment
+            if (paymentIntent.status === 'succeeded') {
+                // Call the new payment/success endpoint
+                const paymentSuccessResponse = await axiosSecure.post('/payment/success', {
+                    applicationId: application._id,
                     paymentId: paymentIntent.id,
-                    status: 'active'
+                    amount: paymentIntent.amount / 100, // Convert back to regular amount
+                    paymentMethod: 'card',
+                    userId: user._id,
+                    userEmail: user.email
                 });
-                navigate('/dashboard/success');
+
+                if (paymentSuccessResponse.data.success) {
+                    console.log('Payment and record creation successful!', {
+                        paymentId: paymentIntent.id,
+                        amount: paymentIntent.amount / 100,
+                        currency: paymentIntent.currency,
+                        applicationId: application._id
+                    });
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Payment Successful!',
+                        text: `Your payment of ৳${(paymentIntent.amount / 100).toFixed(2)} has been processed`,
+                        confirmButtonText: 'View Payment History'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            navigate('/dashboard/payment-history');
+                        } else {
+                            navigate('/dashboard');
+                        }
+                    });
+                } else {
+                    throw new Error('Failed to record payment details');
+                }
             }
         } catch (err) {
             console.error('Payment error:', err);
-            toast.error('Payment failed. Please try again.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Payment Failed',
+                text: err.message || 'There was an issue processing your payment',
+                confirmButtonText: 'Try Again'
+            });
+        } finally {
+            setProcessing(false);
+            Swal.close();
         }
     };
 
@@ -131,7 +192,6 @@ const PaymentForm = ({ applicationId }) => {  // Changed prop name to be explici
                 </p>
             </div>
 
-            {/* Payment form remains the same */}
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -164,10 +224,12 @@ const PaymentForm = ({ applicationId }) => {  // Changed prop name to be explici
 
                 <button
                     type="submit"
-                    disabled={!stripe}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!stripe || processing}
+                    className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 ${
+                        !stripe || processing ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                 >
-                    Pay ৳{monthlyAmount.toFixed(2)}
+                    {processing ? 'Processing...' : `Pay ৳${monthlyAmount.toFixed(2)}`}
                 </button>
 
                 <div className="flex items-center justify-center text-xs text-gray-500 mt-4">

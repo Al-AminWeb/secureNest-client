@@ -25,6 +25,8 @@ import ManageAgent from "../pages/DashBoard/ManageAgent/ManageAgent.jsx";
 import PaymentStatus from "../pages/DashBoard/payment status/PaymentStatus.jsx";
 import MakePayment from "../pages/DashBoard/make payment/MakePayment.jsx";
 import Payment from "../pages/DashBoard/Payment/Payment.jsx";
+import ManageTransactions from "../pages/DashBoard/ManageTransactions/ManageTransactions.jsx";
+import Profile from "../pages/Profile/Profile.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -84,6 +86,10 @@ export const router = createBrowserRouter([
             {
                 path:'become-agent',
                 element:<BecomeAnAgent />,
+            },
+            {
+                path:'profile',
+                element:<Profile />,
             }
         ]
     },
@@ -108,6 +114,11 @@ export const router = createBrowserRouter([
                   path:'manage-agents',
                     element: <ManageAgent/>,
                 },
+                {
+                   path:'transactions',
+                    element: <ManageTransactions/>
+                },
+
                 // user
                 {
                     path: 'my-policies',
@@ -125,6 +136,7 @@ export const router = createBrowserRouter([
                     path:'stripe-payment/:id',
                     element: <Payment/>
                 },
+
 
 
 

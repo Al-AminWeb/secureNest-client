@@ -45,6 +45,22 @@ const Header = () => {
                                         </NavLink>
                                     </li>
                                     <li>
+                                        <NavLink
+                                            to="/dashboard"
+                                            className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-accent hover:text-white"
+                                        >
+                                            Dashboard
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            to="/profile"
+                                            className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-accent hover:text-white"
+                                        >
+                                            Profile
+                                        </NavLink>
+                                    </li>
+                                    <li>
                                         <button
                                             onClick={logOut}
                                             className="w-full text-left block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-accent hover:text-white"
@@ -52,6 +68,7 @@ const Header = () => {
                                             Logout
                                         </button>
                                     </li>
+
                                 </ul>
                             </div>
                         </div>

@@ -49,11 +49,11 @@ const PaymentStatus = () => {
                                 <div className="flex justify-between items-start mb-4">
                                     <h3 className="text-xl font-semibold text-gray-800">{app.policyName}</h3>
                                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                        app.payment?.status === 'Paid'
+                                        app.paymentStatus === 'Paid'
                                             ? 'bg-green-100 text-green-800'
                                             : 'bg-yellow-100 text-yellow-800'
                                     }`}>
-                                        {app.payment?.status || 'Payment Due'}
+                                        {app.paymentStatus || 'Payment Due'}
                                     </span>
                                 </div>
 
@@ -84,7 +84,7 @@ const PaymentStatus = () => {
 
                                 <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                                     <div className="flex items-center space-x-2">
-                                        {app.payment?.status === 'Paid' ? (
+                                        {app.paymentStatus === 'Paid' ? (
                                             <>
                                                 <FaCheckCircle className="text-green-500" />
                                                 <span className="text-sm text-gray-600">Payment completed</span>
