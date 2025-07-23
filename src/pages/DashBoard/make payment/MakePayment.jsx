@@ -1,14 +1,14 @@
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { FaMoneyCheckAlt, FaCalendarAlt } from "react-icons/fa";
+import { FaMoneyCheckAlt } from "react-icons/fa";
 import { MdOutlinePolicy } from "react-icons/md";
 
 const MakePayment = () => {
-    const { id } = useParams();
+    const { id } = useParams();                   // this is the application ID
+    console.log("[MakePayment] application id from URL:", id);
     const axiosSecure = useAxiosSecure();
-    const [frequency, setFrequency] = useState("monthly");
+    const navigate = useNavigate();
 
     const { data: application, isLoading } = useQuery({
         queryKey: ["application", id],
@@ -16,8 +16,9 @@ const MakePayment = () => {
             const res = await axiosSecure.get(`/applications/${id}`);
             return res.data;
         },
-    });
 
+    });
+    console.log(id );
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-[50vh]">
@@ -30,28 +31,11 @@ const MakePayment = () => {
         return <p className="text-center text-red-500 mt-10">Application not found.</p>;
     }
 
-    const premium = parseFloat(application.premium);
-    const yearly = premium * 12 * 0.9;
-    const total = frequency === "monthly" ? premium : yearly;
+    // read the stored monthlyPayment
+    const monthly = parseFloat(application.monthlyPayment);
 
-    const handleStripePayment = async () => {
-        try {
-            const res = await axiosSecure.post("/create-checkout-session", {
-                amount: total,
-                applicationId: id,
-                email: application.email,
-                frequency,
-            });
-
-            if (res.data?.url) {
-                window.location.href = res.data.url;
-            } else {
-                alert("Something went wrong. Try again.");
-            }
-        } catch (err) {
-            console.error("Stripe Payment Error:", err);
-            alert("Payment failed. Please try again.");
-        }
+    const handleStripePayment = () => {
+        navigate(`/dashboard/stripe-payment/${application._id}`);
     };
 
     return (
@@ -61,36 +45,26 @@ const MakePayment = () => {
                     Payment for Policy
                 </h2>
 
+                {/* show policy name & monthly payment */}
                 <div className="space-y-4 mb-6">
                     <div className="flex items-center gap-3 text-lg">
                         <MdOutlinePolicy className="text-primary" />
-                        <span><strong>Policy:</strong> {application.policyName}</span>
+                        <span>
+              <strong>Policy:</strong> {application.policyName}
+            </span>
                     </div>
                     <div className="flex items-center gap-3 text-lg">
                         <FaMoneyCheckAlt className="text-primary" />
-                        <span><strong>Base Premium:</strong> ${premium.toFixed(2)}</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-lg">
-                        <FaCalendarAlt className="text-primary" />
-                        <span><strong>Frequency:</strong> {frequency === "monthly" ? "Monthly" : "Yearly"}</span>
+                        <span>
+              <strong>Monthly Payment:</strong> ৳{monthly.toFixed(2)}
+            </span>
                     </div>
                 </div>
 
-                <div className="mb-6">
-                    <label className="block text-sm font-medium mb-2 text-gray-700">Choose Payment Frequency:</label>
-                    <select
-                        className="select select-bordered w-full text-base"
-                        value={frequency}
-                        onChange={(e) => setFrequency(e.target.value)}
-                    >
-                        <option value="monthly">Monthly - ${premium.toFixed(2)}</option>
-                        <option value="yearly">Yearly (10% discount) - ${yearly.toFixed(2)}</option>
-                    </select>
-                </div>
-
+                {/* total & proceed */}
                 <div className="text-center">
                     <p className="mb-4 text-lg">
-                        <strong>Total to Pay:</strong> ${total.toFixed(2)}
+                        <strong>Total to Pay:</strong> ৳{monthly.toFixed(2)}
                     </p>
                     <button
                         onClick={handleStripePayment}

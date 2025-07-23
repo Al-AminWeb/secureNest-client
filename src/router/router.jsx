@@ -24,6 +24,7 @@ import BecomeAnAgent from "../pages/become agent/BecomeAnAgent.jsx";
 import ManageAgent from "../pages/DashBoard/ManageAgent/ManageAgent.jsx";
 import PaymentStatus from "../pages/DashBoard/payment status/PaymentStatus.jsx";
 import MakePayment from "../pages/DashBoard/make payment/MakePayment.jsx";
+import Payment from "../pages/DashBoard/Payment/Payment.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -117,9 +118,14 @@ export const router = createBrowserRouter([
                     element: <PaymentStatus/>,
                 },
                 {
-                    path: "payment/:id",
+                    path: "make-payment/:id",
                     element: <MakePayment />,
                 },
+                {
+                    path:'stripe-payment/:id',
+                    element: <Payment/>
+                },
+
 
 
                 // agent
