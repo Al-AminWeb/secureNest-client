@@ -23,6 +23,7 @@ import BlogDetails from "../pages/Home/blogs/BlogDetails.jsx";
 import BecomeAnAgent from "../pages/become agent/BecomeAnAgent.jsx";
 import ManageAgent from "../pages/DashBoard/ManageAgent/ManageAgent.jsx";
 import PaymentStatus from "../pages/DashBoard/payment status/PaymentStatus.jsx";
+import MakePayment from "../pages/DashBoard/make payment/MakePayment.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -114,6 +115,10 @@ export const router = createBrowserRouter([
                 {
                     path: 'payment-status',
                     element: <PaymentStatus/>,
+                },
+                {
+                    path: "payment/:id",
+                    element: <MakePayment />,
                 },
 
 

@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { FaEye, FaUserCheck, FaTimesCircle } from "react-icons/fa";
 import Swal from 'sweetalert2';
-import { useNavigate } from 'react-router';
 
 const statusColors = {
   Approved: "bg-green-100 text-green-700 border-green-300",
@@ -11,58 +10,62 @@ const statusColors = {
 };
 
 const ManageApplications = () => {
-    const [applications, setApplications] = useState([]);
+  const [applications, setApplications] = useState([]);
   const [agents, setAgents] = useState([]);
   const [selectedAgents, setSelectedAgents] = useState({});
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
-    const axiosSecure = useAxiosSecure();
-    const navigate = useNavigate();
+  const axiosSecure = useAxiosSecure();
 
-    useEffect(() => {
-        const fetchApplications = async () => {
-            try {
-        const response = await axiosSecure.get("/applications");
-                setApplications(response.data);
-            } catch (error) {
-                console.error("Error fetching applications:", error);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [appsRes, agentsRes] = await Promise.all([
+          axiosSecure.get("/applications"),
+          axiosSecure.get("/agents")
+        ]);
+        setApplications(appsRes.data);
+        setAgents(agentsRes.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed to load data',
+          text: 'Please try again later.'
+        });
       } finally {
         setLoading(false);
-            }
-        };
-    const fetchAgents = async () => {
-      try {
-        const response = await axiosSecure.get("/agents");
-        setAgents(response.data);
-      } catch (error) {
-        console.error("Error fetching agents:", error);
       }
     };
-        fetchApplications();
-    fetchAgents();
-    }, [axiosSecure]);
+    fetchData();
+  }, [axiosSecure]);
 
   const handleAgentChange = (applicationId, agentId) => {
-    setSelectedAgents((prev) => ({ ...prev, [applicationId]: agentId }));
+    setSelectedAgents(prev => ({ ...prev, [applicationId]: agentId }));
   };
 
   const handleAssignAgent = async (applicationId) => {
     const agentId = selectedAgents[applicationId];
     if (!agentId) return;
+
     try {
       await axiosSecure.patch(`/applications/${applicationId}/assign-agent`, { agentId });
-      setApplications((prev) => prev.map(app => app._id === applicationId ? { ...app, agentId, status: "Approved" } : app));
+      setApplications(prev => prev.map(app =>
+          app._id === applicationId ? { ...app, agentId, status: "Approved" } : app
+      ));
       Swal.fire({
         icon: 'success',
-        title: 'Agent Assigned',
-        text: 'Agent has been assigned and application approved!'
+        title: 'Success!',
+        text: 'Agent assigned and application approved!',
+        timer: 2000,
+        showConfirmButton: false
       });
     } catch (error) {
       console.error("Error assigning agent:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Assignment Failed',
+        title: 'Failed',
         text: 'Failed to assign agent. Please try again.'
       });
     }
@@ -70,24 +73,29 @@ const ManageApplications = () => {
 
   const handleReject = async (applicationId) => {
     try {
+      // First update status in backend
       await axiosSecure.patch(`/applications/${applicationId}/status`, { status: "Rejected" });
-      setApplications((prev) => prev.map(app => app._id === applicationId ? { ...app, status: "Rejected" } : app));
+
+      // Then remove from local state
+      setApplications(prev => prev.filter(app => app._id !== applicationId));
+
       Swal.fire({
         icon: 'success',
         title: 'Application Rejected',
-        text: 'The application has been rejected.'
+        text: 'The application has been removed.',
+        timer: 2000,
+        showConfirmButton: false
       });
     } catch (error) {
       console.error("Error rejecting application:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Rejection Failed',
+        title: 'Failed',
         text: 'Failed to reject application. Please try again.'
       });
     }
   };
 
-  // Replace handleView to open modal
   const handleView = (applicationId) => {
     const app = applications.find(a => a._id === applicationId);
     setSelectedApplication(app);
@@ -99,142 +107,194 @@ const ManageApplications = () => {
     setSelectedApplication(null);
   };
 
-    return (
-    <div className="max-w-7xl mx-auto p-4">
-      <h2 className="text-3xl font-bold mb-6 text-center text-primary">Manage Insurance Applications</h2>
-      <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-          </div>
-        ) : applications.length === 0 ? (
-          <div className="py-16 text-center text-gray-500 text-lg">No applications found.</div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full table-auto border-collapse">
-                <thead>
-                <tr className="bg-gray-50 sticky top-0 z-10">
-                  <th className="py-3 px-4 border-b font-semibold">Applicant Name</th>
-                  <th className="py-3 px-4 border-b font-semibold">Email</th>
-                  <th className="py-3 px-4 border-b font-semibold">Policy Name</th>
-                  <th className="py-3 px-4 border-b font-semibold">Application Date</th>
-                  <th className="py-3 px-4 border-b font-semibold">Status</th>
-                  <th className="py-3 px-4 border-b font-semibold">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                {applications.map((application, idx) => (
-                  <tr
-                    key={application._id}
-                    className={
-                      idx % 2 === 0
-                        ? "bg-white hover:bg-blue-50 transition"
-                        : "bg-gray-50 hover:bg-blue-50 transition"
-                    }
-                  >
-                    <td className="py-3 px-4 border-b">{application.name}</td>
-                    <td className="py-3 px-4 border-b">{application.email}</td>
-                    <td className="py-3 px-4 border-b">{application.policyName}</td>
-                    <td className="py-3 px-4 border-b">
-                            {new Date(application.createdAt).toLocaleDateString()}
+  return (
+      <div className="max-w-7xl mx-auto p-4 sm:p-6">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-primary">
+          Manage Insurance Applications
+        </h2>
+
+        <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
+          {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+              </div>
+          ) : applications.length === 0 ? (
+              <div className="py-16 text-center text-gray-500 text-lg">
+                No pending applications found.
+              </div>
+          ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Applicant
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Policy
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                  {applications.map((application) => (
+                      <tr key={application._id} className="hover:bg-gray-50 transition">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {application.name}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {application.email}
+                              </div>
+                            </div>
+                          </div>
                         </td>
-                    <td className="py-3 px-4 border-b">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">{application.policyName}</div>
+                          <div className="text-sm text-gray-500">
+                            ${application.coverage} coverage
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {new Date(application.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-block px-3 py-1 rounded-full border text-xs font-semibold ${
-                          statusColors[application.status] || "bg-gray-100 text-gray-700 border-gray-300"
-                        }`}
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              statusColors[application.status] || "bg-gray-100 text-gray-800"
+                          }`}
                       >
                         {application.status}
                       </span>
-                    </td>
-                    <td className="py-3 px-4 border-b">
-                      <div className="flex flex-col md:flex-row gap-2 items-center justify-center">
-                        {/* View Details */}
-                        <button
-                          className="flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium px-2 py-1 rounded transition"
-                          title="View Details"
-                          onClick={() => handleView(application._id)}
-                        >
-                          <FaEye /> <span className="hidden md:inline">View</span>
-                        </button>
-                        {/* Assign Agent Dropdown */}
-                        <div className="flex items-center gap-2">
-                          <select
-                            className="border rounded px-2 py-1 text-sm focus:outline-primary"
-                            value={selectedAgents[application._id] || ''}
-                            onChange={e => handleAgentChange(application._id, e.target.value)}
-                            title="Select Agent"
-                          >
-                            <option value="">Assign Agent</option>
-                            {agents.map(agent => (
-                              <option key={agent._id} value={agent._id}>{agent.name}</option>
-                            ))}
-                          </select>
-                          <button
-                            className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded flex items-center gap-1 text-sm disabled:opacity-50"
-                            onClick={() => handleAssignAgent(application._id)}
-                            disabled={!selectedAgents[application._id]}
-                            title="Assign Agent"
-                          >
-                            <FaUserCheck /> <span className="hidden md:inline">Assign</span>
-                          </button>
-                        </div>
-                        {/* Reject Button */}
-                        <button
-                          className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded flex items-center gap-1 text-sm disabled:opacity-50"
-                          onClick={() => handleReject(application._id)}
-                          disabled={application.status === "Rejected"}
-                          title="Reject Application"
-                        >
-                          <FaTimesCircle /> <span className="hidden md:inline">Reject</span>
-                            </button>
-                      </div>
                         </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-      {/* Modal for Application Details */}
-      {modalOpen && selectedApplication && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            {/* 👇 Blurry Transparent Background Layer */}
-            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex space-x-2">
+                            {/* View Button */}
+                            <button
+                                onClick={() => handleView(application._id)}
+                                className="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-50"
+                                title="View details"
+                            >
+                              <FaEye className="h-5 w-5" />
+                            </button>
 
-            {/* 👇 Modal Content */}
-            <div className="relative z-50 bg-white rounded-lg shadow-lg max-w-lg w-full p-6">
-              <button
-                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold"
-                  onClick={closeModal}
-                  title="Close"
-              >
-                &times;
-              </button>
-              <h3 className="text-xl font-bold mb-4 text-primary">Application Details</h3>
-              <div className="space-y-2">
-                <div><span className="font-semibold">Applicant Name:</span> {selectedApplication.name}</div>
-                <div><span className="font-semibold">Email:</span> {selectedApplication.email}</div>
-                <div><span className="font-semibold">Address:</span> {selectedApplication.address}</div>
-                <div><span className="font-semibold">NID:</span> {selectedApplication.nid}</div>
-                <div><span className="font-semibold">Policy Name:</span> {selectedApplication.policyName}</div>
-                <div><span className="font-semibold">Coverage:</span> {selectedApplication.coverage}</div>
-                <div><span className="font-semibold">Premium:</span> {selectedApplication.premium}</div>
-                <div><span className="font-semibold">Duration:</span> {selectedApplication.duration}</div>
-                <div><span className="font-semibold">Nominee Name:</span> {selectedApplication.nomineeName}</div>
-                <div><span className="font-semibold">Nominee Relation:</span> {selectedApplication.nomineeRelation}</div>
-                <div><span className="font-semibold">Health Disclosure:</span> {selectedApplication.healthDisclosure}</div>
-                <div><span className="font-semibold">Status:</span> {selectedApplication.status}</div>
-                <div><span className="font-semibold">Created At:</span> {new Date(selectedApplication.createdAt).toLocaleString()}</div>
-                <div><span className="font-semibold">Last Updated:</span> {selectedApplication.lastUpdated ? new Date(selectedApplication.lastUpdated).toLocaleString() : 'N/A'}</div>
+                            {/* Assign Agent Dropdown */}
+                            <div className="relative inline-block">
+                              <select
+                                  value={selectedAgents[application._id] || ''}
+                                  onChange={(e) => handleAgentChange(application._id, e.target.value)}
+                                  className="block w-full pl-2 pr-8 py-1 text-sm border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                                  disabled={application.status === "Approved"}
+                              >
+                                <option value="">Select Agent</option>
+                                {agents.map(agent => (
+                                    <option key={agent._id} value={agent._id}>
+                                      {agent.name}
+                                    </option>
+                                ))}
+                              </select>
+                              <button
+                                  onClick={() => handleAssignAgent(application._id)}
+                                  disabled={!selectedAgents[application._id] || application.status === "Approved"}
+                                  className="ml-2 px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  title="Assign agent"
+                              >
+                                <FaUserCheck className="inline mr-1" />
+                                Assign
+                              </button>
+                            </div>
+
+                            {/* Reject Button */}
+                            <button
+                                onClick={() => handleReject(application._id)}
+                                disabled={application.status === "Rejected"}
+                                className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Reject application"
+                            >
+                              <FaTimesCircle className="h-5 w-5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                  ))}
+                  </tbody>
+                </table>
+              </div>
+          )}
+        </div>
+
+        {/* Application Details Modal */}
+        {modalOpen && selectedApplication && (
+            <div className="fixed inset-0 z-50 overflow-y-auto">
+              <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div
+                    className="fixed inset-0 transition-opacity"
+                    aria-hidden="true"
+                    onClick={closeModal}
+                >
+                  <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
+
+                <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                  <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div className="sm:flex sm:items-start">
+                      <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                        <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                          Application Details
+                        </h3>
+                        <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {Object.entries({
+                            'Applicant Name': selectedApplication.name,
+                            'Email': selectedApplication.email,
+                            'Address': selectedApplication.address,
+                            'NID/SSN': selectedApplication.nid,
+                            'Policy Name': selectedApplication.policyName,
+                            'Coverage': `$${selectedApplication.coverage}`,
+                            'Premium': `$${selectedApplication.premium}`,
+                            'Duration': selectedApplication.duration,
+                            'Nominee Name': selectedApplication.nomineeName,
+                            'Nominee Relation': selectedApplication.nomineeRelation,
+                            'Health Disclosure': selectedApplication.healthDisclosure?.join(', ') || 'None',
+                            'Status': selectedApplication.status,
+                            'Created At': new Date(selectedApplication.createdAt).toLocaleString(),
+                            'Agent': selectedApplication.agentId
+                                ? agents.find(a => a._id === selectedApplication.agentId)?.name
+                                : 'Not assigned'
+                          }).map(([key, value]) => (
+                              <div key={key} className="text-sm">
+                                <p className="font-medium text-gray-500">{key}</p>
+                                <p className="mt-1 text-gray-900">{value || '-'}</p>
+                              </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button
+                        type="button"
+                        onClick={closeModal}
+                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-      )}
-
-    </div>
-    );
+        )}
+      </div>
+  );
 };
 
 export default ManageApplications;
