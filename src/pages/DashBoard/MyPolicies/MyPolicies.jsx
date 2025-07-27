@@ -105,6 +105,8 @@ const MyPolicies = () => {
     const [selectedApplication, setSelectedApplication] = useState(null);
     const [rating, setRating] = useState(0);
     const [feedback, setFeedback] = useState("");
+    const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+    const [detailsApplication, setDetailsApplication] = useState(null);
 
     useEffect(() => {
         const fetchPolicies = async () => {
@@ -149,8 +151,9 @@ const MyPolicies = () => {
     };
 
     const handleViewDetails = (applicationId) => {
-        // Implement navigation to policy details
-        console.log('View details for:', applicationId);
+        const app = applications.find(a => a._id === applicationId);
+        setDetailsApplication(app);
+        setDetailsModalOpen(true);
     };
 
     if (isLoading) {
@@ -211,14 +214,21 @@ const MyPolicies = () => {
                                                 document={<PolicyPDF application={application} />}
                                                 fileName={`SecureNest_Policy_${application._id}.pdf`}
                                             >
-                                                {({ loading }) => (
+                                                {({ loading, url, blob, error }) => (
                                                     <button
-                                                        className={`text-xs px-3 py-1 rounded ${
-                                                            loading
-                                                                ? 'bg-gray-400 text-white'
-                                                                : 'bg-blue-600 text-white hover:bg-blue-700'
-                                                        }`}
+                                                        className={`text-xs px-3 py-1 rounded ${loading ? 'bg-gray-400 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
                                                         disabled={loading}
+                                                        onClick={() => {
+                                                            if (!loading) {
+                                                                Swal.fire({
+                                                                    icon: 'success',
+                                                                    title: 'Download Started',
+                                                                    text: 'Your policy PDF download is starting.',
+                                                                    timer: 1500,
+                                                                    showConfirmButton: false
+                                                                });
+                                                            }
+                                                        }}
                                                     >
                                                         {loading ? 'Generating...' : 'Download PDF'}
                                                     </button>
@@ -300,6 +310,37 @@ const MyPolicies = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Details Modal */}
+            {detailsModalOpen && detailsApplication && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                  <h3 className="text-xl font-semibold mb-4">Policy Details</h3>
+                  <div className="mb-2"><b>Policy Name:</b> {detailsApplication.policyName}</div>
+                  <div className="mb-2"><b>Status:</b> {detailsApplication.status}</div>
+                  <div className="mb-2"><b>Coverage:</b> {detailsApplication.coverage}</div>
+                  <div className="mb-2"><b>Premium:</b> {detailsApplication.premium}%</div>
+                  <div className="mb-2"><b>Monthly Payment:</b> ৳{detailsApplication.monthlyPayment}</div>
+                  <div className="mb-2"><b>Annual Payment:</b> ৳{detailsApplication.annualPayment}</div>
+                  <div className="mb-2"><b>Duration:</b> {detailsApplication.duration}</div>
+                  <div className="mb-2"><b>Nominee:</b> {detailsApplication.nomineeName}</div>
+                  <div className="mb-2"><b>Nominee Relation:</b> {detailsApplication.nomineeRelation}</div>
+                  <div className="mb-2"><b>Applied On:</b> {new Date(detailsApplication.createdAt).toLocaleDateString()}</div>
+                  {/* Show feedback if rejected */}
+                  {detailsApplication.status === 'Rejected' && detailsApplication.rejectionFeedback && (
+                    <div className="mb-2 text-red-600">
+                      <b>Rejection Reason:</b> {detailsApplication.rejectionFeedback}
+                    </div>
+                  )}
+                  <button
+                    onClick={() => setDetailsModalOpen(false)}
+                    className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
             )}
         </div>
     );

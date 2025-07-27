@@ -16,6 +16,9 @@ const ManageApplications = () => {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [rejectionFeedback, setRejectionFeedback] = useState('');
+  const [rejectingId, setRejectingId] = useState(null);
   const axiosSecure = useAxiosSecure();
 
   useEffect(() => {
@@ -71,28 +74,23 @@ const ManageApplications = () => {
     }
   };
 
-  const handleReject = async (applicationId) => {
+  const openRejectModal = (id) => {
+    setRejectingId(id);
+    setRejectionFeedback('');
+    setRejectModalOpen(true);
+  };
+
+  const handleRejectSubmit = async () => {
     try {
-      // First update status in backend
-      await axiosSecure.patch(`/applications/${applicationId}/status`, { status: "Rejected" });
-
-      // Then remove from local state
-      setApplications(prev => prev.filter(app => app._id !== applicationId));
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Application Rejected',
-        text: 'The application has been removed.',
-        timer: 2000,
-        showConfirmButton: false
+      await axiosSecure.patch(`/applications/${rejectingId}/status`, {
+        status: "Rejected",
+        rejectionFeedback
       });
+      setApplications(prev => prev.filter(app => app._id !== rejectingId));
+      setRejectModalOpen(false);
+      Swal.fire({ icon: 'success', title: 'Application Rejected', text: 'Feedback sent to user.', timer: 1500, showConfirmButton: false });
     } catch (error) {
-      console.error("Error rejecting application:", error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Failed',
-        text: 'Failed to reject application. Please try again.'
-      });
+      Swal.fire({ icon: 'error', title: 'Failed', text: 'Failed to reject application. Please try again.' });
     }
   };
 
@@ -222,7 +220,7 @@ const ManageApplications = () => {
 
                             {/* Reject Button */}
                             <button
-                                onClick={() => handleReject(application._id)}
+                                onClick={() => openRejectModal(application._id)}
                                 disabled={application.status === "Rejected" || application.status === "Active"}
                                 className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
                                 title="Reject application"
@@ -299,6 +297,32 @@ const ManageApplications = () => {
                 </div>
               </div>
             </div>
+        )}
+
+        {/* Rejection Modal */}
+        {rejectModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h3 className="text-xl font-semibold mb-4">Rejection Feedback</h3>
+              <textarea
+                rows="4"
+                value={rejectionFeedback}
+                onChange={e => setRejectionFeedback(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
+                placeholder="Enter reason for rejection..."
+              />
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setRejectModalOpen(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+                >Cancel</button>
+                <button
+                  onClick={handleRejectSubmit}
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                >Submit</button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
   );
