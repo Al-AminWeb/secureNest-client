@@ -8,6 +8,7 @@ import {
     FaCalendarAlt,
     FaSmoking
 } from 'react-icons/fa';
+import ProgressBar from '../../components/ProgressBar';
 
 const QuoteEstimator = () => {
     const { policyId } = useParams();
@@ -69,6 +70,7 @@ const QuoteEstimator = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 py-8 px-4 sm:px-6 lg:px-8">
+            <ProgressBar step={1} />
             <div className="max-w-2xl mx-auto">
                 <div className="rounded-2xl shadow-xl overflow-hidden">
                     {/* Header */}

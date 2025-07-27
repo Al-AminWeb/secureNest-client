@@ -9,7 +9,7 @@ const AllPolicies = () => {
 
     const [page, setPage] = useState(1);
     const [category, setCategory] = useState('');
-    const [order, setOrder] = useState('asc');
+    const [order] = useState('asc');
     const [searchInput, setSearchInput] = useState('');
     const [search, setSearch] = useState('');
 
@@ -42,10 +42,6 @@ const AllPolicies = () => {
         setPage(1);
     };
 
-    const handleOrderChange = (e) => {
-        setOrder(e.target.value);
-        setPage(1);
-    };
 
     const handleSearchChange = (e) => {
         setSearchInput(e.target.value);

@@ -3,6 +3,7 @@ import useAuth from '../../../hooks/useAuth';
 import { Link } from 'react-router';
 import useAxiosSecure from "../../../hooks/useAxiosSecure.jsx";
 import { FaMoneyBillWave, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import ProgressBar from '../../../components/ProgressBar';
 
 const PaymentStatus = () => {
     const { user } = useAuth();
@@ -36,6 +37,7 @@ const PaymentStatus = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+            <ProgressBar step={3} />
             <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Status</h1>

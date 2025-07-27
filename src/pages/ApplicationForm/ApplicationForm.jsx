@@ -1,9 +1,10 @@
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
-import { useParams, useLocation } from 'react-router';
+import { useParams, useLocation, useNavigate } from 'react-router';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
 import { useState, useEffect } from 'react';
 import useAuth from '../../hooks/useAuth.jsx';
+import ProgressBar from '../../components/ProgressBar';
 
 const ApplicationForm = () => {
     const { policyId } = useParams();
@@ -13,6 +14,7 @@ const ApplicationForm = () => {
     const [policyDetails, setPolicyDetails] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     // Set up form with default values from user
     const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({
@@ -93,6 +95,7 @@ const ApplicationForm = () => {
                     confirmButtonColor: '#4bb543',
                 });
                 reset();
+                navigate('/dashboard/payment-status');
             }
         } catch (error) {
             console.error('Application Error:', error);
@@ -108,6 +111,7 @@ const ApplicationForm = () => {
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <ProgressBar step={2} />
             <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
                 {/* Header with gradient */}
                 <div className="bg-gradient-to-r from-blue-600 to-blue-400 p-6 text-white">
