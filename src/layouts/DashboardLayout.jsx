@@ -113,6 +113,26 @@ const DashboardLayout = () => {
                                     Manage Blogs
                                 </NavLink>
                             </li>
+                            <li>
+                                <NavLink to="/dashboard/my-policies" className={navLinkStyle} onClick={closeMenu}>
+                                    <HiDocumentText className="text-xl"/>
+                                    My Policies
+                                </NavLink>
+                            </li>
+
+                            <li>
+                                <NavLink to="/dashboard/payment-status" className={navLinkStyle} onClick={closeMenu}>
+                                    <HiCurrencyDollar className="text-xl"/>
+                                    Payment Status
+                                </NavLink>
+                            </li>
+
+                            <li>
+                                <NavLink to="/dashboard/claim-request" className={navLinkStyle} onClick={closeMenu}>
+                                    <HiClipboardCheck className="text-xl"/>
+                                    Claim Request Form
+                                </NavLink>
+                            </li>
 
                         </>
                     }

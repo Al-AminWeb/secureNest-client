@@ -2,10 +2,12 @@ import { useContext, useState } from 'react';
 import { NavLink } from 'react-router';
 import { AuthContext } from '../../../contexts/AuthContext.jsx';
 import logo from '../../../assets/logo (3).png';
+import useUserRole from '../../../hooks/useUserRole.jsx';
 
 const Header = () => {
     const { user, logOut } = useContext(AuthContext);
     const [isOpen, setIsOpen] = useState(false);
+    const { role, isLoading } = useUserRole();
 
     return (
         <nav className="bg-background border-b shadow-sm dark:bg-gray-900">
@@ -60,7 +62,6 @@ const Header = () => {
                                             Logout
                                         </button>
                                     </li>
-
                                 </ul>
                             </div>
                         </div>
@@ -131,18 +132,6 @@ const Header = () => {
                         </li>
                         <li>
                             <NavLink
-                                to="/agents"
-                                className={({ isActive }) =>
-                                    `block py-2 px-3 rounded ${
-                                        isActive ? 'text-accent' : 'text-gray-700 dark:text-white'
-                                    } hover:text-accent`
-                                }
-                            >
-                                Agents
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink
                                 to="/faq"
                                 className={({ isActive }) =>
                                     `block py-2 px-3 rounded ${
@@ -168,19 +157,21 @@ const Header = () => {
                                     </NavLink>
                                 </li>
 
-                                <li>
-                                    <NavLink
-                                        to="/become-agent"
-                                        className={({ isActive }) =>
-                                            `block py-2 px-3 rounded ${
-                                                isActive ? 'text-accent' : 'text-gray-700 dark:text-white'
-                                            } hover:text-accent`
-                                        }
-                                    >
-                                        Become an Agent
-                                    </NavLink>
-                                </li>
-
+                                {/* ✅ Show Become an Agent ONLY if role = user */}
+                                {!isLoading && role === 'user' && (
+                                    <li>
+                                        <NavLink
+                                            to="/become-agent"
+                                            className={({ isActive }) =>
+                                                `block py-2 px-3 rounded ${
+                                                    isActive ? 'text-accent' : 'text-gray-700 dark:text-white'
+                                                } hover:text-accent`
+                                            }
+                                        >
+                                            Become an Agent
+                                        </NavLink>
+                                    </li>
+                                )}
                             </>
                         )}
                     </ul>

@@ -14,7 +14,6 @@ import QuoteEstimator from "../pages/qoute/QuoteEstimator.jsx";
 import ApplicationForm from "../pages/ApplicationForm/ApplicationForm.jsx";
 import ManageUsers from "../pages/DashBoard/ManageUsers/ManageUsers.jsx";
 import ManageApplications from "../pages/DashBoard/ManageApplications/ManageApplications.jsx";
-import MyPolicies from "../pages/DashBoard/MyPolicies/MyPolicies.jsx";
 import FAQ from "../pages/Home/faq/FAQ.jsx";
 import ManageBlogs from "../pages/DashBoard/manage blogs/ManageBlogs.jsx";
 import CreateBlog from "../pages/DashBoard/create blog/CreateBlog.jsx";
@@ -32,6 +31,8 @@ import AssignedCustomers from "../pages/DashBoard/AssignedCustomers/AssignedCust
 import Forbidden from "../pages/forbidden/Forbidden.jsx";
 import PrivateRoute from "../routes/PrivateRoute.jsx";
 import AdminRoute from "../routes/AdminRoute.jsx";
+import MyPolicies from "../pages/DashBoard/MyPolicies/MyPolicies.jsx";
+import AgentRoute from "../routes/AgentRoute.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -149,39 +150,71 @@ export const router = createBrowserRouter([
                 // user
                 {
                     path: 'my-policies',
-                    element: <MyPolicies/>,
+                    element:
+                        <PrivateRoute>
+                            <MyPolicies/>
+                        </PrivateRoute>,
                 },
                 {
                     path: 'payment-status',
-                    element: <PaymentStatus/>,
+                    element:
+                        <PrivateRoute>
+                            <PaymentStatus/>
+                        </PrivateRoute>
+
                 },
                 {
                     path: "make-payment/:id",
-                    element: <MakePayment/>,
+                    element:
+                        <PrivateRoute>
+                            <MakePayment/>
+                        </PrivateRoute>
                 },
                 {
                     path: 'stripe-payment/:id',
-                    element: <Payment/>
+                    element:
+                        <PrivateRoute>
+                            <Payment/>
+                        </PrivateRoute>
                 },
                 {
                     path: 'claim-request',
-                    element: <ClaimRequest/>,
+                    element:
+                        <PrivateRoute>
+                            <ClaimRequest/>
+                        </PrivateRoute>,
                 },
 
 
                 // agent
                 {
                     path: 'manage-blogs',
-                    element: <ManageBlogs/>,
+                    element:
+                        <PrivateRoute>
+                            <AgentRoute>
+                                <ManageBlogs/>
+                            </AgentRoute>
+                        </PrivateRoute>,
                 },
                 {
                     path: 'manage-blogs/create',
-                    element: <CreateBlog/>,
+                    element:
+                        <PrivateRoute>
+                            <AgentRoute>
+                                <CreateBlog/>
+                            </AgentRoute>
+
+                        </PrivateRoute>,
                 },
 
                 {
                     path: "assigned-customers",
-                    element: <AssignedCustomers/>
+                    element:
+                        <PrivateRoute>
+                          <AgentRoute>
+                              <AssignedCustomers/>
+                          </AgentRoute>
+                        </PrivateRoute>
                 }
 
 
