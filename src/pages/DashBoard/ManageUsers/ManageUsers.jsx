@@ -10,7 +10,9 @@ const ManageUsers = () => {
         const fetchUsers = async () => {
             try {
                 const response = await axiosSecure.get("/users");
-                setUsers(response.data);
+                // Filter out admin users - only show regular users and agents
+                const filteredUsers = response.data.filter(user => user.role !== 'admin');
+                setUsers(filteredUsers);
             } catch (error) {
                 console.error("Error fetching users:", error);
             }

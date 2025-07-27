@@ -3,15 +3,30 @@ import Swal from 'sweetalert2';
 import { useParams, useLocation } from 'react-router';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
 import { useState, useEffect } from 'react';
+import useAuth from '../../hooks/useAuth.jsx';
 
 const ApplicationForm = () => {
     const { policyId } = useParams();
     const { state } = useLocation();
     const { monthlyPayment, annualPayment } = state || {};
-    const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const axiosSecure = useAxiosSecure();
     const [policyDetails, setPolicyDetails] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { user } = useAuth();
+
+    // Set up form with default values from user
+    const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({
+        defaultValues: {
+            name: user?.displayName || user?.name || '',
+            email: user?.email || ''
+        }
+    });
+
+    // When user changes (e.g. after login), update form values
+    useEffect(() => {
+        setValue('name', user?.displayName || user?.name || '');
+        setValue('email', user?.email || '');
+    }, [user, setValue]);
 
     // Fetch policy data based on policyId
     useEffect(() => {
@@ -43,8 +58,11 @@ const ApplicationForm = () => {
 
         setIsSubmitting(true);
 
+        // Always use user info from useAuth
         const application = {
             ...data,
+            name: user?.displayName || user?.name || '',
+            email: user?.email || '',
             status: 'Pending',
             healthDisclosure: data.healthDisclosure || [],
             policyId,
@@ -120,6 +138,8 @@ const ApplicationForm = () => {
                                         {...register('name', { required: 'Name is required' })}
                                         className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                                         placeholder="John Doe"
+                                        value={user?.displayName || user?.name || ''}
+                                        readOnly
                                     />
                                     {errors.name && (
                                         <p className="mt-1 text-sm text-red-600">
@@ -142,6 +162,8 @@ const ApplicationForm = () => {
                                         })}
                                         className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                                         placeholder="john@example.com"
+                                        value={user?.email || ''}
+                                        readOnly
                                     />
                                     {errors.email && (
                                         <p className="mt-1 text-sm text-red-600">

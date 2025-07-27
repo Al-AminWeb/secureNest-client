@@ -134,7 +134,8 @@ const PaymentForm = ({ applicationId }) => {
                     amount: paymentIntent.amount / 100, // Convert back to regular amount
                     paymentMethod: 'card',
                     userId: user._id,
-                    userEmail: user.email
+                    userEmail: user.email,
+                    userName: user.displayName || user.name || ''
                 });
 
                 if (paymentSuccessResponse.data.success) {

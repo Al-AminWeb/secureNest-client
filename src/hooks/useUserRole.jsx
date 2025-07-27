@@ -1,27 +1,25 @@
 import { useQuery } from '@tanstack/react-query';
- // Get user data from AuthContext
 import useAxiosSecure from './useAxiosSecure';
-import useAuth from "./useAuth.jsx"; // Secure axios instance
+import useAuth from "./useAuth.jsx";
 
 // Custom Hook to get User Role
 const useUserRole = () => {
-    const { user } = useAuth(); // Get the user from AuthContext
-    const axiosSecure = useAxiosSecure(); // Secure axios instance
+    const { user } = useAuth();
+    const axiosSecure = useAxiosSecure();
 
-    // Use TanStack Query to fetch the role based on the user's email
+
     const { data: roleData, isLoading, isError, error } = useQuery({
         queryKey: ['userRole', user?.email], // Query by email
         queryFn: async () => {
-            if (!user?.email) return null; // Ensure email exists before making the API call
+            if (!user?.email) return null;
 
-            // Fetch the role by sending the email to the backend
             const response = await axiosSecure.get(`/check-role?email=${user.email}`);
-            return response.data; // Assume response contains role data
+            return response.data;
         },
-        enabled: !!user?.email, // Only enable this query if the user is logged in
+        enabled: !!user?.email,
     });
 
-    // Return the role and loading/error states
+
     return {
         role: roleData ? (roleData.isAdmin ? 'admin' : roleData.isAgent ? 'agent' : 'user') : null,
         isLoading,

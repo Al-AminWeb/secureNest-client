@@ -205,24 +205,31 @@ const ManageApplications = () => {
                               </select>
                               <button
                                   onClick={() => handleAssignAgent(application._id)}
-                                  disabled={!selectedAgents[application._id] || application.status === "Approved"}
+                                  disabled={
+                                      !selectedAgents[application._id] ||
+                                      application.status === "Approved" ||
+                                      application.status === "Active" ||
+                                      application.status === "Rejected"
+                                  }
                                   className="ml-2 px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                                   title="Assign agent"
                               >
                                 <FaUserCheck className="inline mr-1" />
                                 Assign
                               </button>
+
                             </div>
 
                             {/* Reject Button */}
                             <button
                                 onClick={() => handleReject(application._id)}
-                                disabled={application.status === "Rejected"}
+                                disabled={application.status === "Rejected" || application.status === "Active"}
                                 className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
                                 title="Reject application"
                             >
                               <FaTimesCircle className="h-5 w-5" />
                             </button>
+
                           </div>
                         </td>
                       </tr>

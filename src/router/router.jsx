@@ -27,6 +27,11 @@ import MakePayment from "../pages/DashBoard/make payment/MakePayment.jsx";
 import Payment from "../pages/DashBoard/Payment/Payment.jsx";
 import ManageTransactions from "../pages/DashBoard/ManageTransactions/ManageTransactions.jsx";
 import Profile from "../pages/Profile/Profile.jsx";
+import ClaimRequest from "../pages/DashBoard/claim request/ClaimRequest.jsx";
+import AssignedCustomers from "../pages/DashBoard/AssignedCustomers/AssignedCustomers.jsx";
+import Forbidden from "../pages/forbidden/Forbidden.jsx";
+import PrivateRoute from "../routes/PrivateRoute.jsx";
+import AdminRoute from "../routes/AdminRoute.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -67,7 +72,8 @@ export const router = createBrowserRouter([
                 Component: BlogDetails,
             },
             {
-
+                path: 'forbidden',
+                Component: Forbidden,
             }
         ],
     },
@@ -84,39 +90,60 @@ export const router = createBrowserRouter([
                 Component: SignUp,
             },
             {
-                path:'become-agent',
-                element:<BecomeAnAgent />,
+                path: 'become-agent',
+                element: <BecomeAnAgent/>,
             },
             {
-                path:'profile',
-                element:<Profile />,
+                path: 'profile',
+                element: <Profile/>,
             }
         ]
     },
     {
         path: '/dashboard',
-        Component: DashboardLayout,
+        element: <PrivateRoute>
+            <DashboardLayout/>
+        </PrivateRoute>,
         children:
             [
                 {
                     path: 'manage-policies',
-                    Component: ManagePolicies,
+                    element:
+                        <AdminRoute>
+                            <ManagePolicies/>
+                        </AdminRoute>
                 },
                 {
                     path: 'manage-users',
-                    element: <ManageUsers/>,
+                    element:
+                        <AdminRoute>
+                            <ManageUsers/>
+                        </AdminRoute>,
                 },
                 {
                     path: 'manage-applications',
-                    element: <ManageApplications/>,
+                    element:
+                        <AdminRoute>
+                            <ManageApplications/>
+                        </AdminRoute>,
+
+
                 },
                 {
-                  path:'manage-agents',
-                    element: <ManageAgent/>,
+                    path: 'manage-agents',
+                    element:
+                        <AdminRoute>
+                            <ManageAgent/>
+                        </AdminRoute>
+
+
                 },
                 {
-                   path:'transactions',
-                    element: <ManageTransactions/>
+                    path: 'transactions',
+                    element:
+                        <AdminRoute>
+                            <ManageTransactions/>
+                        </AdminRoute>
                 },
 
                 // user
@@ -130,14 +157,16 @@ export const router = createBrowserRouter([
                 },
                 {
                     path: "make-payment/:id",
-                    element: <MakePayment />,
+                    element: <MakePayment/>,
                 },
                 {
-                    path:'stripe-payment/:id',
+                    path: 'stripe-payment/:id',
                     element: <Payment/>
                 },
-
-
+                {
+                    path: 'claim-request',
+                    element: <ClaimRequest/>,
+                },
 
 
                 // agent
@@ -146,9 +175,16 @@ export const router = createBrowserRouter([
                     element: <ManageBlogs/>,
                 },
                 {
-                    path:'manage-blogs/create',
-                    element: <CreateBlog />,
+                    path: 'manage-blogs/create',
+                    element: <CreateBlog/>,
+                },
+
+                {
+                    path: "assigned-customers",
+                    element: <AssignedCustomers/>
                 }
+
+
             ]
     }
 ])

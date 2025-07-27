@@ -5,6 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
+
 const ManageTransactions = () => {
     const axiosSecure = useAxiosSecure();
     const [startDate, setStartDate] = useState(null);
@@ -13,10 +14,11 @@ const ManageTransactions = () => {
     const [filterPolicy, setFilterPolicy] = useState('');
     const [totalIncome, setTotalIncome] = useState(0);
 
-    const { data: transactions = [], isLoading, refetch } = useQuery({
+    const { data: transactions = [], isLoading } = useQuery({
         queryKey: ['transactions'],
         queryFn: async () => {
             const res = await axiosSecure.get('/payment-history/all');
+            console.log('Raw transaction data:', res.data.data);
             return res.data.data;
         }
     });
@@ -77,8 +79,12 @@ const ManageTransactions = () => {
 
             {/* Stats Card */}
             <div className="bg-white p-4 rounded-lg shadow mb-6">
-                <h2 className="text-lg font-semibold mb-2">Total Income</h2>
-                <p className="text-3xl font-bold text-green-600">৳{totalIncome.toFixed(2)}</p>
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h2 className="text-lg font-semibold mb-2">Total Income</h2>
+                        <p className="text-3xl font-bold text-green-600">৳{totalIncome.toFixed(2)}</p>
+                    </div>
+                </div>
             </div>
 
             {/* Filters */}
@@ -202,13 +208,15 @@ const ManageTransactions = () => {
                                 </td>
                             </tr>
                         ) : (
-                            filteredTransactions.map((transaction) => (
+                            filteredTransactions.map((transaction) => {
+                                console.log('Transaction user data:', transaction.user);
+                                return (
                                 <tr key={transaction._id}>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {transaction.paymentId.substring(0, 8)}...
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {transaction.user?.email || 'N/A'}
+                                        {transaction.user?.email || transaction.application?.userEmail || 'N/A'}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {transaction.policyName || 'N/A'}
@@ -229,7 +237,8 @@ const ManageTransactions = () => {
                                             </span>
                                     </td>
                                 </tr>
-                            ))
+                            );
+                            })
                         )}
                         </tbody>
                     </table>
