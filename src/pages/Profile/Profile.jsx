@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { getAuth } from 'firebase/auth';
 import useAxiosSecure from "../../hooks/useAxiosSecure.jsx";
 import useAuth from "../../hooks/useAuth.jsx";
+import axios from "axios";
 
 const Profile = () => {
     const { user, loading, updateUserProfile } = useAuth();
@@ -17,6 +18,7 @@ const Profile = () => {
         role: ''
     });
     const [isUpdating, setIsUpdating] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     // Get role badge color
     const getRoleBadgeColor = () => {
@@ -54,14 +56,31 @@ const Profile = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setFormData(prev => ({ ...prev, photoURL: reader.result }));
-            };
-            reader.readAsDataURL(file);
+            setIsUploading(true);
+            try {
+                // Create FormData for image upload
+                const data = new FormData();
+                data.append('image', file);
+                
+                // Upload to ImgBB
+                const imageUploadUrl = `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_image_upload_key}`;
+                const res = await axios.post(imageUploadUrl, data);
+                
+                if (res.data.success) {
+                    setFormData(prev => ({ ...prev, photoURL: res.data.data.url }));
+                    toast.success('Image uploaded successfully');
+                } else {
+                    throw new Error('Image upload failed');
+                }
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                toast.error('Failed to upload image');
+            } finally {
+                setIsUploading(false);
+            }
         }
     };
 
@@ -70,15 +89,22 @@ const Profile = () => {
         setIsUpdating(true);
 
         try {
-            // Update Firebase auth profile
-            await updateUserProfile({
-                displayName: formData.name,
-                photoURL: formData.photoURL
-            });
+            // Update Firebase auth profile - only if photoURL is not too long
+            const updateData = {
+                displayName: formData.name
+            };
+            
+            // Only include photoURL if it's a valid URL (not base64)
+            if (formData.photoURL && !formData.photoURL.startsWith('data:')) {
+                updateData.photoURL = formData.photoURL;
+            }
 
-            // Update in MongoDB
+            await updateUserProfile(updateData);
+
+            // Update in MongoDB - include email in the request
             await axiosSecure.patch('/users/update-profile', {
                 name: formData.name,
+                email: user.email,
                 photoURL: formData.photoURL
             });
 
@@ -124,16 +150,24 @@ const Profile = () => {
                                             className="w-32 h-32 rounded-full object-cover border-4 border-white shadow"
                                         />
                                         {editMode && (
-                                            <label className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 cursor-pointer">
+                                            <label className={`absolute bottom-0 right-0 ${isUploading ? 'bg-gray-400' : 'bg-blue-500'} text-white rounded-full p-2 cursor-pointer ${isUploading ? 'cursor-not-allowed' : ''}`}>
                                                 <input
                                                     type="file"
                                                     className="hidden"
                                                     onChange={handleFileChange}
                                                     accept="image/*"
+                                                    disabled={isUploading}
                                                 />
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fillRule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                                                </svg>
+                                                {isUploading ? (
+                                                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                                                    </svg>
+                                                )}
                                             </label>
                                         )}
                                     </div>
@@ -176,10 +210,10 @@ const Profile = () => {
                                             <div className="flex space-x-3">
                                                 <button
                                                     type="submit"
-                                                    disabled={isUpdating}
+                                                    disabled={isUpdating || isUploading}
                                                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                                                 >
-                                                    {isUpdating ? 'Saving...' : 'Save Changes'}
+                                                    {isUpdating ? 'Saving...' : isUploading ? 'Uploading...' : 'Save Changes'}
                                                 </button>
                                                 <button
                                                     type="button"

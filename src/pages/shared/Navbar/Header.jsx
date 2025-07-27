@@ -46,14 +46,6 @@ const Header = () => {
                                     </li>
                                     <li>
                                         <NavLink
-                                            to="/dashboard"
-                                            className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-accent hover:text-white"
-                                        >
-                                            Dashboard
-                                        </NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink
                                             to="/profile"
                                             className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-accent hover:text-white"
                                         >
