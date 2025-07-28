@@ -1,61 +1,71 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
-
 import Swal from "sweetalert2";
 import useAuth from "../../../hooks/useAuth.jsx";
+import { FaFileAlt, FaCheckCircle, FaSpinner } from "react-icons/fa";
 
 const ClaimRequest = () => {
     const { user } = useAuth();
     const axiosSecure = useAxiosSecure();
     const navigate = useNavigate();
-
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [reasons, setReasons] = useState({}); // Track reason for each policy
+    const [submitting, setSubmitting] = useState(false);
+    const [reasons, setReasons] = useState({});
 
-    // ✅ Fetch active applications
+    // Fetch active applications by email
     useEffect(() => {
-        if (!user || !user._id) return;
+        if (!user?.email) return;
 
         const fetchApplications = async () => {
             try {
-                const res = await axiosSecure.get(`/applications?userId=${user._id}&status=Active`);
+                const res = await axiosSecure.get(`/applications/active-by-email?email=${user.email}`);
                 setApplications(res.data || []);
             } catch (error) {
                 console.error("Error fetching active policies:", error);
-                Swal.fire("Error", "Failed to load your active policies", "error");
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Failed to load your active policies",
+                    background: '#fff',
+                    color: '#1a365d',
+                    confirmButtonColor: '#4299e1'
+                });
             } finally {
                 setLoading(false);
             }
         };
 
         fetchApplications();
-    }, [axiosSecure, user]);
+    }, [axiosSecure, user?.email]);
 
-
-    // ✅ Handle reason input
     const handleReasonChange = (id, value) => {
-        setReasons({
-            ...reasons,
-            [id]: value,
-        });
+        setReasons(prev => ({ ...prev, [id]: value }));
     };
 
-    // ✅ Submit claim
     const handleSubmit = async (app) => {
         const reason = reasons[app._id];
-        if (!reason || reason.trim() === "") {
-            Swal.fire("Error", "Please provide a reason for the claim", "error");
+        if (!reason?.trim()) {
+            Swal.fire({
+                icon: "error",
+                title: "Missing Information",
+                text: "Please provide a reason for the claim",
+                background: '#fff',
+                color: '#1a365d',
+                confirmButtonColor: '#4299e1'
+            });
             return;
         }
 
+        setSubmitting(true);
         const claimData = {
             applicationId: app._id,
-            userId: user._id,
             userEmail: user.email,
             policyName: app.policyName,
             reason,
+            status: "Pending",
+            submittedAt: new Date()
         };
 
         try {
@@ -63,71 +73,136 @@ const ClaimRequest = () => {
             if (res.data.success) {
                 Swal.fire({
                     icon: "success",
-                    title: "Claim Submitted",
-                    text: "Your claim request has been submitted successfully",
-                    confirmButtonColor: "#3085d6",
-                }).then(() => {
-                    navigate("/dashboard");
+                    title: "Claim Submitted!",
+                    text: "Your claim request has been received",
+                    background: '#fff',
+                    color: '#1a365d',
+                    confirmButtonColor: '#4299e1'
                 });
+                navigate("/dashboard/my-claims");
             } else {
-                Swal.fire("Error", res.data.message || "Failed to submit claim", "error");
+                Swal.fire({
+                    icon: "error",
+                    title: "Submission Failed",
+                    text: res.data.message || "Failed to submit claim",
+                    background: '#fff',
+                    color: '#1a365d',
+                    confirmButtonColor: '#4299e1'
+                });
             }
         } catch (error) {
-            console.error("Error submitting claim:", error);
-            Swal.fire("Error", "Something went wrong. Please try again.", "error");
+            console.error("Claim submission error:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Failed to submit claim. Please try again.",
+                background: '#fff',
+                color: '#1a365d',
+                confirmButtonColor: '#4299e1'
+            });
+        } finally {
+            setSubmitting(false);
         }
     };
 
     if (loading) {
-        return <div className="p-6 text-center text-gray-600">Loading your policies...</div>;
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <FaSpinner className="animate-spin text-blue-500 text-4xl mx-auto mb-4" />
+                    <p className="text-gray-700 text-lg">Loading your policies...</p>
+                </div>
+            </div>
+        );
     }
 
-    if (applications.length === 0) {
+    if (!applications.length) {
         return (
-            <div className="p-6 text-center text-gray-700 font-semibold">
-                You have no active policies to claim.
+            <div className="min-h-screen flex items-center justify-center px-4">
+                <div className="max-w-md bg-white rounded-xl shadow-md p-8 text-center">
+                    <FaFileAlt className="text-gray-400 text-5xl mx-auto mb-4" />
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">No Active Policies</h2>
+                    <p className="text-gray-600 mb-6">You don't have any active policies eligible for claims.</p>
+                    <button
+                        onClick={() => navigate("/dashboard")}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+                    >
+                        Back to Dashboard
+                    </button>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
-            <h1 className="text-2xl font-bold mb-6 text-gray-800">Claim Request Form</h1>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+                <div className="text-center mb-10">
+                    <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                        File a <span className="text-blue-600">Claim Request</span>
+                    </h1>
+                    <p className="mt-3 max-w-2xl mx-auto text-lg text-gray-600">
+                        Submit a claim for your active insurance policies
+                    </p>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {applications.map((app) => (
-                    <div
-                        key={app._id}
-                        className="max-w-md mx-auto bg-white border border-gray-200 rounded-lg shadow-md p-5"
-                    >
-                        <h2 className="text-xl font-semibold mb-2 text-gray-800">
-                            {app.policyName}
-                        </h2>
-                        <p className="text-sm text-gray-500 mb-4">
-                            Duration: {app.duration} Years | Coverage: {app.coverage}
-                        </p>
+                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    {applications.map(app => (
+                        <div key={app._id} className="bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-[1.02]">
+                            <div className="bg-blue-600 px-6 py-4">
+                                <h2 className="text-xl font-bold text-white">{app.policyName}</h2>
+                                <p className="text-blue-100">{app.coverage}</p>
+                            </div>
 
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Reason for Claim *
-                            </label>
-                            <textarea
-                                value={reasons[app._id] || ""}
-                                onChange={(e) => handleReasonChange(app._id, e.target.value)}
-                                rows="4"
-                                className="w-full border border-gray-300 rounded-lg p-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                placeholder="Describe the reason for your claim..."
-                            ></textarea>
+                            <div className="p-6">
+                                <div className="flex justify-between mb-4">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-500">Premium</p>
+                                        <p className="text-lg font-semibold">{app.premium}%</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-500">Status</p>
+                                        <div className="flex items-center">
+                                            <FaCheckCircle className="text-green-500 mr-1" />
+                                            <span className="font-medium">{app.status}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="mb-6">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Reason for Claim <span className="text-red-500">*</span>
+                                    </label>
+                                    <textarea
+                                        value={reasons[app._id] || ""}
+                                        onChange={(e) => handleReasonChange(app._id, e.target.value)}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        rows={4}
+                                        placeholder="Describe the reason for your claim in detail..."
+                                        required
+                                    />
+                                </div>
+
+                                <button
+                                    onClick={() => handleSubmit(app)}
+                                    disabled={submitting}
+                                    className={`w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors ${
+                                        submitting ? 'opacity-75 cursor-not-allowed' : ''
+                                    }`}
+                                >
+                                    {submitting ? (
+                                        <>
+                                            <FaSpinner className="animate-spin mr-2" />
+                                            Processing...
+                                        </>
+                                    ) : (
+                                        'Submit Claim Request'
+                                    )}
+                                </button>
+                            </div>
                         </div>
-
-                        <button
-                            onClick={() => handleSubmit(app)}
-                            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-                        >
-                            Submit Claim
-                        </button>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
         </div>
     );

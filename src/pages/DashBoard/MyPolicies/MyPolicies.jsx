@@ -271,7 +271,7 @@ const MyPolicies = () => {
 
             {/* Review Modal */}
             {reviewModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-transparent bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg p-6 w-full max-w-md">
                         <h3 className="text-xl font-semibold mb-4">Submit Your Review</h3>
                         <div className="mb-4">
@@ -314,34 +314,34 @@ const MyPolicies = () => {
 
             {/* Details Modal */}
             {detailsModalOpen && detailsApplication && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg p-6 w-full max-w-md">
-                  <h3 className="text-xl font-semibold mb-4">Policy Details</h3>
-                  <div className="mb-2"><b>Policy Name:</b> {detailsApplication.policyName}</div>
-                  <div className="mb-2"><b>Status:</b> {detailsApplication.status}</div>
-                  <div className="mb-2"><b>Coverage:</b> {detailsApplication.coverage}</div>
-                  <div className="mb-2"><b>Premium:</b> {detailsApplication.premium}%</div>
-                  <div className="mb-2"><b>Monthly Payment:</b> ৳{detailsApplication.monthlyPayment}</div>
-                  <div className="mb-2"><b>Annual Payment:</b> ৳{detailsApplication.annualPayment}</div>
-                  <div className="mb-2"><b>Duration:</b> {detailsApplication.duration}</div>
-                  <div className="mb-2"><b>Nominee:</b> {detailsApplication.nomineeName}</div>
-                  <div className="mb-2"><b>Nominee Relation:</b> {detailsApplication.nomineeRelation}</div>
-                  <div className="mb-2"><b>Applied On:</b> {new Date(detailsApplication.createdAt).toLocaleDateString()}</div>
-                  {/* Show feedback if rejected */}
-                  {detailsApplication.status === 'Rejected' && detailsApplication.rejectionFeedback && (
-                    <div className="mb-2 text-red-600">
-                      <b>Rejection Reason:</b> {detailsApplication.rejectionFeedback}
+                <div className="fixed inset-0 bg-transparent bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+                        <h3 className="text-xl font-semibold mb-4">Policy Details</h3>
+                        <div className="mb-2"><b>Policy Name:</b> {detailsApplication.policyName}</div>
+                        <div className="mb-2"><b>Status:</b> {detailsApplication.status}</div>
+                        <div className="mb-2"><b>Coverage:</b> {detailsApplication.coverage}</div>
+                        <div className="mb-2"><b>Premium:</b> {detailsApplication.premium}%</div>
+                        <div className="mb-2"><b>Monthly Payment:</b> ৳{detailsApplication.monthlyPayment}</div>
+                        <div className="mb-2"><b>Annual Payment:</b> ৳{detailsApplication.annualPayment}</div>
+                        <div className="mb-2"><b>Duration:</b> {detailsApplication.duration}</div>
+                        <div className="mb-2"><b>Nominee:</b> {detailsApplication.nomineeName}</div>
+                        <div className="mb-2"><b>Nominee Relation:</b> {detailsApplication.nomineeRelation}</div>
+                        <div className="mb-2"><b>Applied On:</b> {new Date(detailsApplication.createdAt).toLocaleDateString()}</div>
+                        {detailsApplication.status === 'Rejected' && detailsApplication.rejectionFeedback && (
+                            <div className="mb-2 text-red-600">
+                                <b>Rejection Reason:</b> {detailsApplication.rejectionFeedback}
+                            </div>
+                        )}
+                        <button
+                            onClick={() => setDetailsModalOpen(false)}
+                            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                            Close
+                        </button>
                     </div>
-                  )}
-                  <button
-                    onClick={() => setDetailsModalOpen(false)}
-                    className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
-                    Close
-                  </button>
                 </div>
-              </div>
             )}
+
         </div>
     );
 };
