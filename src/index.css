@@ -30,3 +30,21 @@
     height: 100%;
     object-fit: cover;
 }
+
+/* styles/swiper.css */
+.swiper {
+    padding: 20px 0;
+}
+
+.swiper-slide {
+    height: auto;
+}
+
+.swiper-pagination-bullet-active {
+    background-color: #3b82f6 !important;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    color: #3b82f6 !important;
+}

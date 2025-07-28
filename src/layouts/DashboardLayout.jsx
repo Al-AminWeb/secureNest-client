@@ -9,6 +9,7 @@ import {
 import {FaBars, FaTimes} from 'react-icons/fa';
 import {useState} from 'react';
 import useUserRole from "../hooks/useUserRole.jsx";
+import DashboardWelcome from '../pages/DashBoard/DashboardWelcome';
 
 const DashboardLayout = () => {
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);

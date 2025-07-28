@@ -33,6 +33,7 @@ import PrivateRoute from "../routes/PrivateRoute.jsx";
 import AdminRoute from "../routes/AdminRoute.jsx";
 import MyPolicies from "../pages/DashBoard/MyPolicies/MyPolicies.jsx";
 import AgentRoute from "../routes/AgentRoute.jsx";
+import DashboardWelcome from "../pages/DashBoard/DashboardWelcome.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -107,6 +108,10 @@ export const router = createBrowserRouter([
         </PrivateRoute>,
         children:
             [
+                {
+                    index: true,
+                    element: <DashboardWelcome />
+                  },
                 {
                     path: 'manage-policies',
                     element:
