@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { NavLink } from 'react-router';
+import { NavLink, useLocation, useNavigate } from 'react-router';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { FcGoogle } from 'react-icons/fc';
 import Swal from "sweetalert2";
@@ -11,6 +11,10 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { signIn,signInWithGoogle } = useAuth();
   const axiosInstance = useAxios();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from?.pathname || '/';
+
   const handleGoogleSignIn = ()=>{
     signInWithGoogle()
         .then(async (result)=>{
@@ -26,6 +30,9 @@ const SignIn = () => {
           console.log(res.data.data)
 
           console.log(result);
+          setTimeout(() => {
+            navigate(from, { replace: true });
+          }, 1600);
         })
     .catch((error)=>{
       console.log(error);
@@ -51,9 +58,9 @@ const SignIn = () => {
           showConfirmButton: false,
         });
 
-        // setTimeout(() => {
-        //   navigate(from, { replace: true });
-        // }, 1600);
+        setTimeout(() => {
+          navigate(from, { replace: true });
+        }, 1600);
       }
     } catch (error) {
       Swal.fire({

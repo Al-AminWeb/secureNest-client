@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { NavLink, useNavigate } from 'react-router';
+import { NavLink, useNavigate, useLocation } from 'react-router';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { FcGoogle } from 'react-icons/fc';
 import Swal from 'sweetalert2';
@@ -15,6 +15,8 @@ const Register = () => {
   const { createUser, updateUser, setUser } = use(AuthContext);
   const [photo, setPhoto] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/dashboard';
   const [profilePic, setProfilePic] =useState('')
   const axiosInstance = useAxios();
 
@@ -55,7 +57,9 @@ const Register = () => {
       });
 
       reset();
-      navigate('/');
+      setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 1600);
     } catch (error) {
       Swal.fire({
         icon: 'error',

@@ -65,7 +65,7 @@ const Banner = () => {
                                     {slide.tagline}
                                 </p>
                                 <Link
-                                    to="/qoute"
+                                    to="/quote"
                                     className="inline-block bg-primary hover:bg-primary/90 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition-colors duration-300 animate-fade-in delay-200"
                                 >
                                     Get a Free Quote

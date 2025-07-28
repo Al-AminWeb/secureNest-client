@@ -34,6 +34,7 @@ import AdminRoute from "../routes/AdminRoute.jsx";
 import MyPolicies from "../pages/DashBoard/MyPolicies/MyPolicies.jsx";
 import AgentRoute from "../routes/AgentRoute.jsx";
 import DashboardWelcome from "../pages/DashBoard/DashboardWelcome.jsx";
+import Quote from "../pages/Home/quote/Quote.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -58,7 +59,11 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'policies/:policyId/apply',
-                Component: ApplicationForm
+                element: <PrivateRoute>
+                    <ApplicationForm>
+
+                    </ApplicationForm>
+                </PrivateRoute>
             },
             {
                 path: 'faq',
@@ -76,6 +81,10 @@ export const router = createBrowserRouter([
             {
                 path: 'forbidden',
                 Component: Forbidden,
+            },
+            {
+                path:'quote',
+                element: <Quote></Quote>
             }
         ],
     },
@@ -93,7 +102,10 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'become-agent',
-                element: <BecomeAnAgent/>,
+                element: <PrivateRoute>
+                    <BecomeAnAgent/>,
+                </PrivateRoute>
+
             },
             {
                 path: 'profile',
@@ -101,6 +113,7 @@ export const router = createBrowserRouter([
             }
         ]
     },
+
     {
         path: '/dashboard',
         element: <PrivateRoute>
