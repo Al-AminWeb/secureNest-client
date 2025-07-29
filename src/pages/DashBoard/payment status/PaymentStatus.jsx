@@ -13,7 +13,10 @@ const PaymentStatus = () => {
         queryKey: ['myPayments', user?.email],
         queryFn: async () => {
             const res = await axiosSecure(`/applications?email=${user.email}`);
-            return res.data.filter(app => app.status === 'Approved');
+            return res.data.filter(app => 
+                app.status === 'Approved' && 
+                app.paymentStatus !== 'Paid'
+            );
         },
     });
 
@@ -62,7 +65,9 @@ const PaymentStatus = () => {
                                 <div className="grid grid-cols-2 gap-4 mb-4">
                                     <div className="space-y-2">
                                         <p className="text-sm text-gray-500">Premium Amount</p>
-                                        <p className="font-medium">৳{app.monthlyPayment}</p>
+                                        <p className="font-medium">
+                                            ৳{app.monthlyPayment || app.premium || 'Not available'}
+                                        </p>
                                     </div>
                                     <div className="space-y-2">
                                         <p className="text-sm text-gray-500">Payment Frequency</p>
@@ -76,11 +81,15 @@ const PaymentStatus = () => {
                                     </div>
                                     <div className="space-y-2">
                                         <p className="text-sm text-gray-500">Coverage</p>
-                                        <p className="font-medium">{app.coverage}</p>
+                                        <p className="font-medium">
+                                            {app.coverage || 'Not available'}
+                                        </p>
                                     </div>
                                     <div className="space-y-2">
                                         <p className="text-sm text-gray-500">Policy Duration</p>
-                                        <p className="font-medium">{app.duration}</p>
+                                        <p className="font-medium">
+                                            {app.duration || 'Not available'}
+                                        </p>
                                     </div>
                                 </div>
 

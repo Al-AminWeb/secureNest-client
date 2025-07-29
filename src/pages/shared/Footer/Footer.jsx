@@ -62,7 +62,7 @@ const Footer = () => {
 
                     {/* Company Info */}
                     <div>
-                        <h3 className="text-2xl font-semibold mb-4">Company</h3>
+                        <h3 className="text-2xl font-semibold mb-4">SecureNest</h3>
                         <p className="text-sm text-gray-300">
                             SecureNest is dedicated to providing the best insurance solutions with transparent pricing, quick claims processing, and top-notch customer service. We are here to make sure you feel secure at all times.
                         </p>

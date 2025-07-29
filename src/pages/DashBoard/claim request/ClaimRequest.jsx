@@ -79,7 +79,7 @@ const ClaimRequest = () => {
                     color: '#1a365d',
                     confirmButtonColor: '#4299e1'
                 });
-                navigate("/dashboard/my-claims");
+                navigate("/");
             } else {
                 Swal.fire({
                     icon: "error",

@@ -208,13 +208,13 @@ const MyPolicies = () => {
                                         }`}>
                                             {application.status}
                                         </span>
-                                    {application.status === 'Approved' && (
+                                    {application.status === 'Active' && (
                                         <div className="mt-2">
                                             <PDFDownloadLink
                                                 document={<PolicyPDF application={application} />}
                                                 fileName={`SecureNest_Policy_${application._id}.pdf`}
                                             >
-                                                {({ loading, url, blob, error }) => (
+                                                {({ loading }) => (
                                                     <button
                                                         className={`text-xs px-3 py-1 rounded ${loading ? 'bg-gray-400 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
                                                         disabled={loading}
@@ -244,17 +244,15 @@ const MyPolicies = () => {
                                     >
                                         Details
                                     </button>
-                                    {application.status === 'Approved' && (
-                                        <button
-                                            onClick={() => {
-                                                setSelectedApplication(application);
-                                                setReviewModalOpen(true);
-                                            }}
-                                            className="text-green-600 hover:text-green-800"
-                                        >
-                                            Review
-                                        </button>
-                                    )}
+                                    <button
+                                        onClick={() => {
+                                            setSelectedApplication(application);
+                                            setReviewModalOpen(true);
+                                        }}
+                                        className="text-green-600 hover:text-green-800"
+                                    >
+                                        Review
+                                    </button>
                                 </td>
                             </tr>
                         ))

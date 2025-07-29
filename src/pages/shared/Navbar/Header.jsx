@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import { NavLink } from 'react-router';
 import { AuthContext } from '../../../contexts/AuthContext.jsx';
 import logo from '../../../assets/logo (3).png';
@@ -7,7 +7,26 @@ import useUserRole from '../../../hooks/useUserRole.jsx';
 const Header = () => {
     const { user, logOut } = useContext(AuthContext);
     const [isOpen, setIsOpen] = useState(false);
+    const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const profileMenuRef = useRef(null);
     const { role, isLoading } = useUserRole();
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+                setProfileMenuOpen(false);
+            }
+        }
+        if (profileMenuOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [profileMenuOpen]);
 
     return (
         <nav className="bg-background border-b shadow-sm dark:bg-gray-900">
@@ -20,15 +39,18 @@ const Header = () => {
                 {/* Profile + Toggle */}
                 <div className="flex items-center gap-4 md:order-2">
                     {user ? (
-                        <div className="relative group">
-                            <button className="flex items-center text-sm rounded-full focus:ring-2 focus:ring-accent">
+                        <div className="relative" ref={profileMenuRef}>
+                            <button
+                                className="flex items-center text-sm rounded-full focus:ring-2 focus:ring-accent"
+                                onClick={() => setProfileMenuOpen((prev) => !prev)}
+                            >
                                 <img
                                     src={user.photoURL || '/default-avatar.png'}
                                     alt="avatar"
                                     className="w-8 h-8 rounded-full"
                                 />
                             </button>
-                            <div className="absolute right-0 mt-2 hidden group-hover:block bg-white dark:bg-gray-700 shadow rounded-lg z-50 w-48">
+                            <div className={`absolute right-0 mt-2 ${profileMenuOpen ? 'block' : 'hidden'} bg-white dark:bg-gray-700 shadow rounded-lg z-50 w-48`}>
                                 <div className="px-4 py-3 border-b dark:border-gray-600">
                                     <p className="text-sm text-gray-800 dark:text-white">
                                         {user.displayName || 'User'}

@@ -19,8 +19,7 @@ const AssignedCustomers = () => {
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
 
-    console.log('Current user:', user);
-    console.log('Current role:', role);
+
 
     useEffect(() => {
         if (!user?.email) return;
@@ -28,7 +27,7 @@ const AssignedCustomers = () => {
         const fetchAssignedCustomers = async () => {
             try {
                 const res = await axiosSecure.get(`/assigned-customers?agentEmail=${user.email}`);
-                console.log('Assigned customers response:', res.data);
+
                 
                 // Handle the response structure properly
                 if (res.data.success && res.data.customers) {

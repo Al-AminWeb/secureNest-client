@@ -11,7 +11,7 @@ const PopularPolicies = () => {
         queryFn: async () => {
             try {
                 const res = await axiosInstance.get('/policies/popular');
-                console.log('Popular policies:', res.data);
+
                 return res.data;
             } catch (error) {
                 console.error('Error fetching popular policies:', error);

@@ -9,7 +9,6 @@ const AllPolicies = () => {
 
     const [page, setPage] = useState(1);
     const [category, setCategory] = useState('');
-    const [order] = useState('asc');
     const [searchInput, setSearchInput] = useState('');
     const [search, setSearch] = useState('');
 
@@ -18,15 +17,15 @@ const AllPolicies = () => {
         const timer = setTimeout(() => {
             setSearch(searchInput);
             setPage(1);
-        }, 4000);
+        }, 500);
         return () => clearTimeout(timer);
     }, [searchInput]);
 
     const { data, isLoading, isError } = useQuery({
-        queryKey: ['allPolicies', page, category, order, search],
+        queryKey: ['allPolicies', page, category, search],
         queryFn: async () => {
             const res = await axiosSecure.get(
-                `/policies?page=${page}&category=${category}&sortBy=&order=${order}&search=${search}`
+                `/policies?page=${page}&category=${category}&search=${search}`
             );
             return res.data;
         },
@@ -120,7 +119,7 @@ const AllPolicies = () => {
                 <span className="mx-4">{page}</span>
                 <button
                     onClick={() => handlePageChange(page + 1)}
-                    disabled={data?.currentPage === data?.totalPages}
+                    disabled={page >= data?.totalPages}
                     className="px-4 py-2 bg-accent text-white rounded-md"
                 >
                     Next

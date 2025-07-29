@@ -18,7 +18,7 @@ const ManageTransactions = () => {
         queryKey: ['transactions'],
         queryFn: async () => {
             const res = await axiosSecure.get('/payment-history/all');
-            console.log('Raw transaction data:', res.data.data);
+
             return res.data.data;
         }
     });

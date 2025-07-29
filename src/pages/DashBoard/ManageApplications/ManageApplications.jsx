@@ -90,7 +90,7 @@ const ManageApplications = () => {
       setRejectModalOpen(false);
       Swal.fire({ icon: 'success', title: 'Application Rejected', text: 'Feedback sent to user.', timer: 1500, showConfirmButton: false });
     } catch (error) {
-      Swal.fire({ icon: 'error', title: 'Failed', text: 'Failed to reject application. Please try again.' });
+      Swal.fire({ icon: 'error', title: 'Failed', text: 'Failed to reject application. Please try again.' ,});
     }
   };
 

@@ -27,9 +27,9 @@ const SignIn = () => {
             lastLogIn:new Date().toISOString(),
           }
           const res = await axiosInstance.post('/users',userInfo)
-          console.log(res.data.data)
 
-          console.log(result);
+
+
           setTimeout(() => {
             navigate(from, { replace: true });
           }, 1600);

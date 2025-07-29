@@ -35,6 +35,7 @@ import MyPolicies from "../pages/DashBoard/MyPolicies/MyPolicies.jsx";
 import AgentRoute from "../routes/AgentRoute.jsx";
 import DashboardWelcome from "../pages/DashBoard/DashboardWelcome.jsx";
 import Quote from "../pages/Home/quote/Quote.jsx";
+import AgentConsultation from '../pages/policy details/AgentConsultation.jsx';
 
 export const router = createBrowserRouter([
     {
@@ -112,6 +113,10 @@ export const router = createBrowserRouter([
                 element: <Profile/>,
             }
         ]
+    },
+    {
+        path: '/agent-consultation',
+        element: <AgentConsultation />,
     },
 
     {

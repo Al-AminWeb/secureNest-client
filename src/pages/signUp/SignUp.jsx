@@ -17,7 +17,7 @@ const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || '/dashboard';
-  const [profilePic, setProfilePic] =useState('')
+  const [profilePic, setProfilePic] = useState('');
   const axiosInstance = useAxios();
 
   const {
@@ -25,7 +25,10 @@ const Register = () => {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm();
+
+  const password = watch("password", ""); // For password confirmation
 
   const onSubmit = async (data) => {
     const { name, photo, email, password } = data;
@@ -34,19 +37,18 @@ const Register = () => {
       const result = await createUser(email, password);
 
       const userInfo = {
-        name:data.name,
-        email:data.email,
-        role:'user',
-        createdAt:new Date().toISOString(),
-        lastLogIn:new Date().toISOString(),
+        name: data.name,
+        email: data.email,
+        role: 'user',
+        createdAt: new Date().toISOString(),
+        lastLogIn: new Date().toISOString(),
       }
 
-      const userRes  = await axiosInstance.post('/users',userInfo);
-      console.log(userRes.data);
+      const userRes = await axiosInstance.post('/users', userInfo);
+
 
       await updateUser({ displayName: name, photoURL: profilePic });
 
-      // ✅ Update local user context
       setUser({ ...result.user, displayName: name, photoURL: profilePic });
 
       Swal.fire({
@@ -68,17 +70,18 @@ const Register = () => {
       });
     }
   };
+
   const handlePhotoChange = async (e) => {
     const image = e.target.files[0];
-    console.log(image);
+
     if (image) {
-      setPhoto(URL.createObjectURL(image)); // Show the selected photo as a preview
+      setPhoto(URL.createObjectURL(image));
     }
 
     const data = new FormData();
     data.append('image', image);
     const imageUploadUrl = `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_image_upload_key}`
-    const res =await axios.post(imageUploadUrl,data)
+    const res = await axios.post(imageUploadUrl, data)
     setProfilePic(res.data.data.url);
   };
 
@@ -117,14 +120,12 @@ const Register = () => {
               <div>
                 <label htmlFor="photo" className="block text-sm font-medium text-gray-700 mb-2">Upload Photo</label>
                 <div className="flex items-center gap-3">
-                  {/* Custom file upload button with an icon */}
                   <label
                       htmlFor="photo"
                       className="inline-flex items-center px-4 py-2 bg-accent text-white rounded-md cursor-pointer hover:bg-teal-600 transition-all"
                   >
                     <FaUpload className="mr-2" /> Upload Image
                   </label>
-                  {/* Hidden file input */}
                   <input
                       id="photo"
                       type="file"
@@ -134,7 +135,6 @@ const Register = () => {
                       className="hidden"
                   />
                   {photo && <img src={photo} alt="Preview" className="w-16 h-16 rounded-full object-cover border" />}
-
                 </div>
                 {errors.photo && <p className="text-red-500 text-sm">{errors.photo.message}</p>}
               </div>
@@ -167,8 +167,12 @@ const Register = () => {
                       required: 'Password is required',
                       minLength: {
                         value: 6,
-                        message: 'Minimum 6 characters',
+                        message: 'Password must be at least 6 characters',
                       },
+                      validate: {
+                        hasUppercase: value => /[A-Z]/.test(value) || 'Must contain at least one uppercase letter',
+                        hasLowercase: value => /[a-z]/.test(value) || 'Must contain at least one lowercase letter',
+                      }
                     })}
                     className="mt-1 block w-full px-4 py-2 border rounded-md"
                 />
@@ -179,11 +183,44 @@ const Register = () => {
                 >
                   {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
                 </button>
-                {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
+                {errors.password && (
+                    <ul className="text-sm text-red-600 list-disc pl-5">
+                      {errors.password.message.split(', ').map((message, i) => (
+                          <li key={i}>{message}</li>
+                      ))}
+                    </ul>
+                )}
               </div>
 
+              {/* Password Strength Indicator */}
+              {password && (
+                  <div className="space-y-1">
+                    <div className="text-sm text-gray-600">Password Strength:</div>
+                    <div className="flex gap-1">
+                      <div
+                          className={`h-1 flex-1 rounded-sm ${
+                              password.length >= 6 ? 'bg-green-500' : 'bg-gray-300'
+                          }`}
+                      ></div>
+                      <div
+                          className={`h-1 flex-1 rounded-sm ${
+                              /[A-Z]/.test(password) ? 'bg-green-500' : 'bg-gray-300'
+                          }`}
+                      ></div>
+                      <div
+                          className={`h-1 flex-1 rounded-sm ${
+                              /[a-z]/.test(password) ? 'bg-green-500' : 'bg-gray-300'
+                          }`}
+                      ></div>
+                    </div>
+                  </div>
+              )}
+
               {/* Submit */}
-              <button type="submit" className="w-full bg-accent text-white py-2 px-4 rounded-md hover:bg-teal-600 transition">
+              <button
+                  type="submit"
+                  className="w-full bg-accent text-white py-2 px-4 rounded-md hover:bg-teal-600 transition"
+              >
                 Register
               </button>
 

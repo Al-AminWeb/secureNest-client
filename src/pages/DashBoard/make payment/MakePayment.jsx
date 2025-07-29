@@ -6,7 +6,7 @@ import { MdOutlinePolicy } from "react-icons/md";
 
 const MakePayment = () => {
     const { id } = useParams();                   // this is the application ID
-    console.log("[MakePayment] application id from URL:", id);
+
     const axiosSecure = useAxiosSecure();
     const navigate = useNavigate();
 
@@ -18,7 +18,7 @@ const MakePayment = () => {
         },
 
     });
-    console.log(id );
+
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-[50vh]">

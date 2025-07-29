@@ -33,7 +33,7 @@ const DashboardLayout = () => {
 
             {/* Mobile Top Bar */}
             <div className="md:hidden flex items-center justify-between   px-4 py-3 fixed top-0 left-0 right-0 z-20">
-                <h2 className="text-xl font-bold text-primary">SecureNest Admin</h2>
+                <h2 className="text-xl font-bold text-primary">SecureNest</h2>
                 <button onClick={toggleMenu} className="text-primary text-2xl">
                     {isMobileMenuOpen ? <FaTimes/> : <FaBars/>}
                 </button>
