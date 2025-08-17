@@ -3,6 +3,25 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
 
+// Skeleton Loading Component
+const PolicyCardSkeleton = () => (
+    <div className="bg-white shadow-md rounded-lg overflow-hidden h-full flex flex-col animate-pulse">
+        <div className="w-full h-48 bg-gray-200"></div>
+        <div className="p-4 flex-grow space-y-3">
+            <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+            </div>
+        </div>
+        <div className="px-4 pb-4">
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+    </div>
+);
+
 const AllPolicies = () => {
     const axiosSecure = useAxiosSecure();
     const navigate = useNavigate();
@@ -11,7 +30,7 @@ const AllPolicies = () => {
     const [category, setCategory] = useState('');
     const [searchInput, setSearchInput] = useState('');
     const [search, setSearch] = useState('');
-    const [sortOption, setSortOption] = useState('default'); // New state for sorting
+    const [sortOption, setSortOption] = useState('default');
     const [sortedPolicies, setSortedPolicies] = useState([]);
 
     // Debounce search input
@@ -82,7 +101,6 @@ const AllPolicies = () => {
         setSortOption(e.target.value);
     };
 
-    if (isLoading) return <p className="text-center py-10 text-xl">Loading policies...</p>;
     if (isError) return <p className="text-center py-10 text-red-500">Failed to load policies.</p>;
 
     return (
@@ -134,51 +152,65 @@ const AllPolicies = () => {
 
             {/* Policies Cards */}
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                {sortedPolicies.map((policy) => (
-                    <div
-                        key={policy._id}
-                        onClick={() => handleCardClick(policy._id)}
-                        className="cursor-pointer bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition h-full flex flex-col"
-                    >
-                        <img
-                            src={policy.image}
-                            alt={policy.title}
-                            className="w-full h-48 object-cover"
-                        />
-                        <div className="p-4 flex-grow">
-                            <h2 className="text-xl font-semibold text-gray-800 mb-2">{policy.title}</h2>
-                            <span className="text-sm text-accent font-medium uppercase">{policy.category}</span>
-                            <p className="mt-2 text-gray-600 text-sm line-clamp-3">
-                                {policy.description}
-                            </p>
+                {isLoading ? (
+                    // Show skeleton loading when data is loading
+                    Array(6).fill(0).map((_, index) => (
+                        <PolicyCardSkeleton key={`skeleton-${index}`} />
+                    ))
+                ) : (
+                    // Show actual policy cards when data is loaded
+                    sortedPolicies.map((policy) => (
+                        <div
+                            key={policy._id}
+                            onClick={() => handleCardClick(policy._id)}
+                            className="cursor-pointer bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition h-full flex flex-col"
+                        >
+                            <img
+                                src={policy.image}
+                                alt={policy.title}
+                                className="w-full h-48 object-cover"
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = '/default-policy-image.jpg'; // Fallback image
+                                }}
+                            />
+                            <div className="p-4 flex-grow">
+                                <h2 className="text-xl font-semibold text-gray-800 mb-2">{policy.title}</h2>
+                                <span className="text-sm text-accent font-medium uppercase">{policy.category}</span>
+                                <p className="mt-2 text-gray-600 text-sm line-clamp-3">
+                                    {policy.description}
+                                </p>
+                            </div>
+                            <div className="px-4 pb-4">
+                                <p className="text-sm font-medium">
+                                    Base Premium: {policy.base_premium}% of coverage
+                                </p>
+                            </div>
                         </div>
-                        <div className="px-4 pb-4">
-                            <p className="text-sm font-medium">
-                                Base Premium: {policy.base_premium}% of coverage
-                            </p>
-                        </div>
-                    </div>
-                ))}
+                    ))
+                )}
             </div>
 
-            {/* Pagination */}
-            <div className="flex justify-center mt-6">
-                <button
-                    onClick={() => handlePageChange(Math.max(page - 1, 1))}
-                    disabled={page === 1}
-                    className="px-4 py-2 bg-accent text-white rounded-md disabled:opacity-50"
-                >
-                    Prev
-                </button>
-                <span className="mx-4 flex items-center">{page} of {data?.totalPages}</span>
-                <button
-                    onClick={() => handlePageChange(page + 1)}
-                    disabled={page >= data?.totalPages}
-                    className="px-4 py-2 bg-accent text-white rounded-md disabled:opacity-50"
-                >
-                    Next
-                </button>
-            </div>
+            {/* Pagination - Only show when not loading */}
+            {!isLoading && (
+                <div className="flex justify-center mt-6">
+                    <button
+                        onClick={() => handlePageChange(Math.max(page - 1, 1))}
+                        disabled={page === 1}
+                        className="px-4 py-2 bg-accent text-white rounded-md disabled:opacity-50"
+                    >
+                        Prev
+                    </button>
+                    <span className="mx-4 flex items-center">{page} of {data?.totalPages}</span>
+                    <button
+                        onClick={() => handlePageChange(page + 1)}
+                        disabled={page >= data?.totalPages}
+                        className="px-4 py-2 bg-accent text-white rounded-md disabled:opacity-50"
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
