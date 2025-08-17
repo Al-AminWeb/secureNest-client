@@ -82,14 +82,6 @@ const TrustedPartners = () => {
           </div>
 
           {/* CTA Section */}
-          <div className="mt-16 text-center">
-            <p className="text-gray-500 text-sm mb-4">
-              Interested in becoming a partner?
-            </p>
-            <button className="bg-primary hover:bg-primary-dark text-white font-medium py-3 px-8 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
-              Partner With Us
-            </button>
-          </div>
         </div>
       </section>
   );
