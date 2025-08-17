@@ -4,7 +4,7 @@ import {
     HiUserGroup,
     HiClipboardCheck,
     HiCurrencyDollar,
-    HiUserCircle, HiHome
+    HiUserCircle, HiHome, HiUser
 } from 'react-icons/hi';
 import {FaBars, FaTimes} from 'react-icons/fa';
 import {useState} from 'react';
@@ -89,6 +89,12 @@ const DashboardLayout = () => {
                                     Manage Agents
                                 </NavLink>
                             </li>
+                            <li>
+                                <NavLink to="/dashboard/profile" className={navLinkStyle} onClick={closeMenu}>
+                                    <HiUser className="text-xl"/>
+                                    My Profile
+                                </NavLink>
+                            </li>
                         </>
                     }
                     {/*agent*/}
@@ -134,7 +140,12 @@ const DashboardLayout = () => {
                                     Claim Request Form
                                 </NavLink>
                             </li>
-
+                            <li>
+                                <NavLink to="/dashboard/profile" className={navLinkStyle} onClick={closeMenu}>
+                                    <HiUser className="text-xl"/>
+                                    My Profile
+                                </NavLink>
+                            </li>
                         </>
                     }
 
@@ -165,6 +176,12 @@ const DashboardLayout = () => {
                                 <NavLink to="/dashboard/claim-request" className={navLinkStyle} onClick={closeMenu}>
                                     <HiClipboardCheck className="text-xl"/>
                                     Claim Request Form
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/dashboard/profile" className={navLinkStyle} onClick={closeMenu}>
+                                    <HiUser className="text-xl"/>
+                                    My Profile
                                 </NavLink>
                             </li>
                         </>

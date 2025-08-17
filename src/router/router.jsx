@@ -37,6 +37,7 @@ import DashboardWelcome from "../pages/DashBoard/DashboardWelcome.jsx";
 import Quote from "../pages/Home/quote/Quote.jsx";
 import AgentConsultation from '../pages/policy details/AgentConsultation.jsx';
 import Error404 from '../pages/error/Error404.jsx';
+import DashboardOverview from "../pages/DashBoard/dashboardOverview/DashBoardOverview.jsx";
 
 export const router = createBrowserRouter([
     {
@@ -129,8 +130,8 @@ export const router = createBrowserRouter([
             [
                 {
                     index: true,
-                    element: <DashboardWelcome />
-                  },
+                    element: <DashboardOverview /> // This is your new overview page
+                },
                 {
                     path: 'manage-policies',
                     element:
@@ -169,6 +170,13 @@ export const router = createBrowserRouter([
                         <AdminRoute>
                             <ManageTransactions/>
                         </AdminRoute>
+                },
+                {
+                    path:'profile',
+                    element:
+                        <PrivateRoute>
+                            <Profile/>
+                        </PrivateRoute>
                 },
 
                 // user

@@ -29,7 +29,7 @@ const Header = () => {
     }, [profileMenuOpen]);
 
     return (
-        <nav className="bg-background border-b shadow-sm dark:bg-gray-900">
+        <nav className="bg-background border-b shadow-sm dark:bg-gray-900 sticky top-0 z-50">
             <div className="max-w-screen-xl mx-auto flex flex-wrap items-center justify-between p-4">
                 {/* Logo */}
                 <NavLink to="/" className="flex items-center space-x-2">

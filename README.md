@@ -127,10 +127,9 @@ This project is licensed under the MIT License.
 - [SwiperJS](https://swiperjs.com/)
 - [SweetAlert2](https://sweetalert2.github.io/)
 - [React Query](https://tanstack.com/query/latest)
-- [DaisyUI](https://daisyui.com/)
 - [React PDF](https://react-pdf.org/)
 - [Firebase](https://firebase.google.com/)
 
 ---
 
-> Made with ❤️ by the SecureNest Team 
+> Made with ❤️ by the Md.Alamin
