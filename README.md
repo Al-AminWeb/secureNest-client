@@ -105,7 +105,7 @@ npm install
 npm run dev
 ```
 
-👉 **Live Demo:** [SecureNest App](https://assignment10-58235.web.app/)
+👉 **Live Demo:** [SecureNest App](https://nest-b72cb.web.app/)
 
 ---
 
