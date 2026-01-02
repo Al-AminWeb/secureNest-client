@@ -105,7 +105,7 @@ npm install
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173` (or as specified by Vite).
+👉 **Live Demo:** [SecureNest App](https://assignment10-58235.web.app/)
 
 ---
 
